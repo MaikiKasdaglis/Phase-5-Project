@@ -45,20 +45,54 @@ class Year(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer)
 
-
-    year_tfp = db.Column(db.Float)
-    year_vja= db.Column(db.Float)
-    year_holiday = db.Column(db.Float)
-    year_time_half = db.Column(db.Float)
-    year_double_time = db.Column(db.Float)
-    year_double_half = db.Column(db.Float)
-    year_triple = db.Column(db.Float)
-    year_overrides = db.Column(db.Integer)
-    year_a_hours = db.Column(db.Float)
+    #=============TAFB
     year_tafb_total = db.Column(db.Float)
+    #NEEDS PAY
     year_int_tafb_total = db.Column(db.Float)
-    year_duty_hours = db.Column(db.Float)
+    #NEEDS PAY
+    #================TFP LYFE
+    year_tfp = db.Column(db.Float)
+    #NEEDS PAY
+    #================ VACATION/SICK LYFE
     year_vacation_sick = db.Column(db.Float)
+    #NEEDS PAY
+    #================VJA LYFE
+    year_vja= db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ HOLIDAY LYFE
+    year_holiday = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ TIME_HALF
+    year_time_half = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ DOUBLE TIME LYFE
+    year_double_time = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ DOUBLE & HALF LYFE
+    year_double_half = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ TRIPLE LYFE
+    year_triple = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ OVERRIDES LYFE
+    year_overrides = db.Column(db.Integer)
+    #NEEDS PAY
+    #================ A-POSITION LYFE
+    year_a_hours = db.Column(db.Float)
+    #NEEDS PAY
+    
+    #============Totals
+    year_total_credits = db.Column(db.Float)
+    year_total_credits_rated = db.Column(db.Float)
+    year_total_pay = db.Column(db.Float)
+    #========New additions=======
+    year_duty_hours = db.Column(db.Float)
 
 # =================RELATIONSHIPS=======================================
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
@@ -67,28 +101,67 @@ class Year(db.Model, SerializerMixin):
     months_field = relationship('Month', back_populates="years_field", cascade='all, delete')
 # =================SERIALIZER RULES====================================
     serialize_rules = ('-users_field',  '-pairings_field','-days_field',)
-    
+# =================REPR====================================
+    def __repr__(self):
+        return f"<Year(id={self.id}, year='{self.year}', year_tfp = {self.year_tfp})>"
+
 class Month(db.Model, SerializerMixin):
     __tablename__ = 'months_table'
     id = db.Column(db.Integer, primary_key=True)
     month = db.Column(db.String)
     year = db.Column(db.Integer)
+
     guarantee_hours = db.Column(db.Float)
 
     #================TOTALS===================
-    month_tfp = db.Column(db.Float)
-    month_vja= db.Column(db.Float)
-    month_holiday = db.Column(db.Float)
-    month_time_half = db.Column(db.Float)
-    month_double_time = db.Column(db.Float)
-    month_double_half = db.Column(db.Float)
-    month_triple = db.Column(db.Float)
-    month_overrides = db.Column(db.Integer)
-    month_a_hours = db.Column(db.Float)
+     #=============TAFB
     month_tafb_total = db.Column(db.Float)
+    #NEEDS PAY
     month_int_tafb_total = db.Column(db.Float)
-    month_duty_hours = db.Column(db.Float)
+    #NEEDS PAY
+    #================TFP LYFE
+    month_tfp = db.Column(db.Float)
+    #NEEDS PAY
+    #================ VACATION/SICK LYFE
     month_vacation_sick = db.Column(db.Float)
+    #NEEDS PAY
+    #================VJA LYFE
+    month_vja= db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ HOLIDAY LYFE
+    month_holiday = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ TIME_HALF
+    month_time_half = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ DOUBLE TIME LYFE
+    month_double_time = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ DOUBLE & HALF LYFE
+    month_double_half = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ TRIPLE LYFE
+    month_triple = db.Column(db.Float)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ OVERRIDES LYFE
+    month_overrides = db.Column(db.Integer)
+    #NEEDS RATE
+    #NEEDS PAY
+    #================ A-POSITION LYFE
+    month_a_hours = db.Column(db.Float)
+    #NEEDS PAY
+    #============Totals
+    month_total_credits = db.Column(db.Float)
+    month_total_credits_rated = db.Column(db.Float)
+    month_total_pay = db.Column(db.Float)
+    #========New additions=======
+    month_duty_hours = db.Column(db.Float)
 
 
     # =================RELATIONSHIPS=======================================
@@ -98,35 +171,73 @@ class Month(db.Model, SerializerMixin):
     pairings_field = relationship('Pairing', back_populates='months_field', cascade = 'all, delete')
     # =================SERIALIZER RULES====================================
     serialize_rules = ('-years_field','-users_field', '-days_field')
-
+    # =================REPR====================================
     def __repr__(self):
-        return f"<Month(id={self.id}, month='{self.month}', year_id = {self.year_id})>"
+        return f"<Month(id={self.id}, month='{self.month}', year_id = {self.year_id}, month_tfp = {self.month_tfp})>"
 
 
 class Pairing(db.Model, SerializerMixin):
     __tablename__ = 'pairings_table'
     id = db.Column(db.Integer, primary_key=True)
     pairing_name = db.Column(db.String)
-    tafb_total = db.Column(db.Float)
-    int_tafb_total = db.Column(db.Float)
+
+    #===============Reserve Stuff 
     reserve_block = db.Column(db.Boolean)
+    pairing_guarantee_hours = db.Column(db.Float)
+    pairing_guarantee_hours_worked_rated = db.Column(db.Float)
+
+    #=============TAFB
+    tafb_total = db.Column(db.Float)
+    tafb_pay = db.Column(db.Float)
+
+    int_tafb_total = db.Column(db.Float)
+    int_tafb_pay = db.Column(db.Float)
+
     #================TOTALS===================
+
+    #================TFP LYFE
     pairing_tfp = db.Column(db.Float)
-    pairing_vja= db.Column(db.Float)
-
-
-    pairing_holiday = db.Column(db.Float)
-
-
-    pairing_time_half = db.Column(db.Float)
-    pairing_double_time = db.Column(db.Float)
-    pairing_double_half = db.Column(db.Float)
-    pairing_triple = db.Column(db.Float)
-    pairing_overrides = db.Column(db.Integer)
-    pairing_a_hours = db.Column(db.Float)
-
-    pairing_duty_hours = db.Column(db.Float)
+    pairing_tfp_pay = db.Column(db.Float)
+    #================ VACATION/SICK LYFE
     pairing_vacation_sick = db.Column(db.Float)
+    pairing_vacation_sick_pay = db.Column(db.Float)
+    #================VJA LYFE
+    pairing_vja= db.Column(db.Float)
+    pairing_vja_rated= db.Column(db.Float)
+    pairing_vja_pay= db.Column(db.Float)
+    #================ HOLIDAY LYFE
+    pairing_holiday = db.Column(db.Float)
+    pairing_holiday_rated = db.Column(db.Float)
+    pairing_holiday_pay = db.Column(db.Float)
+    #================ TIME_HALF
+    pairing_time_half = db.Column(db.Float)
+    pairing_time_half_rated = db.Column(db.Float)
+    pairing_time_half_pay = db.Column(db.Float)
+    #================ DOUBLE TIME LYFE
+    pairing_double_time = db.Column(db.Float)
+    pairing_double_time_rated = db.Column(db.Float)
+    pairing_double_time_pay = db.Column(db.Float)
+    #================ DOUBLE & HALF LYFE
+    pairing_double_half = db.Column(db.Float)
+    pairing_double_half_rated = db.Column(db.Float)
+    pairing_double_half_pay = db.Column(db.Float)
+    #================ TRIPLE LYFE
+    pairing_triple = db.Column(db.Float)
+    pairing_triple_rated = db.Column(db.Float)
+    pairing_triple_pay = db.Column(db.Float)
+    #================ OVERRIDES LYFE
+    pairing_overrides = db.Column(db.Integer)
+    pairing_overrides_pay = db.Column(db.Integer)
+    #================ A-POSITION LYFE
+    pairing_a_hours = db.Column(db.Float)
+    pairing_a_pay = db.Column(db.Float)
+    #============Totals
+    pairing_total_credits = db.Column(db.Float)
+    pairing_total_credits_rated = db.Column(db.Float)
+    pairing_total_pay = db.Column(db.Float)
+    #========New additions=======
+    pairing_duty_hours = db.Column(db.Float)
+
 
     # =================RELATIONSHIPS=======================================
     month_id = db.Column(db.Integer, db.ForeignKey('months_table.id'))
@@ -135,9 +246,9 @@ class Pairing(db.Model, SerializerMixin):
     days_field = relationship('Day', back_populates='pairings_field', cascade = 'all, delete')
     # =================SERIALIZER RULES====================================
     serialize_rules = ('-years_field','-months_field', '-users_field')
-
+    # =================REPR====================================
     def __repr__(self):
-        return f"<Pairing(id={self.id}, pairing_name='{self.pairing_name}', month_id = {self.month_id})>"
+        return f"<Pairing(id={self.id}, pairing_name='{self.pairing_name}', month_id = {self.month_id}, pairing_tfp={self.pairing_tfp})>"
 
 class Day(db.Model, SerializerMixin):
     __tablename__ = 'days_table'
@@ -197,7 +308,9 @@ class Day(db.Model, SerializerMixin):
     pairings_field = relationship('Pairing', back_populates='days_field')
     # =================SERIALIZER RULES====================================
     serialize_rules = ('-years_field','-months_field', '-users_field', '-pairings_field')
-    
+     # =================REPR====================================
+    def __repr__(self):
+        return f"<Day(id={self.id}, date='{self.date}', pairing_id = {self.pairing_id}, total_tfp={self.total_tfp})>"
     
 
     

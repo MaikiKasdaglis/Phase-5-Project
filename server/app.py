@@ -11,9 +11,96 @@ from flask_restful import Resource
 from config import app, db, api
 # Add your model imports
 from models import User, Month, Pairing, Day, Year
+import requests
 
 
 # Views go here!
+#======================DAY MATH========================================
+def tfp_pay_function(total_tfp):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = user.tfp_pay * total_tfp
+    print(total) 
+    return round(total, 2) 
+
+def more_better_function_rate(tfp, rate):
+    total = tfp * rate
+    return total
+def more_better_function_pay(total_tfp, rate):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = user.tfp_pay * (total_tfp * rate)
+    print(total) 
+    return round(total, 2) 
+
+#===========================1.5=======================================
+def one_point_five_rate(tfp):
+    total = tfp * 1.5
+    return total
+def one_point_five_pay(tfp):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = (tfp * 1.5)* user.tfp_pay
+    return round(total, 2)
+#===========================2=======================================
+def double_rate(tfp):
+    total = tfp * 2
+    return total
+def double_pay(tfp):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = (tfp * 2)* user.tfp_pay
+    return round(total, 2)
+#===========================2.5=======================================
+def double_point_five_rate(tfp):
+    total = tfp * 2.5
+    return total
+def double_point_five_pay(tfp):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = (tfp * 2.5)* user.tfp_pay
+    return round(total, 2)
+#===========================3=======================================
+def triple_rate(tfp):
+    total = tfp * 3
+    return total
+def triple_pay(tfp):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = (tfp * 3)* user.tfp_pay
+    return round(total, 2)
+#===========================A_Pay // TAFB // Overrides=========================
+def a_position_hours(*hours):
+    sum = 0 
+    for n in hours:
+        sum = sum + n
+    return sum
+def a_position_pay(position, hours):
+    if position:
+        user = User.query.filter(User.id == session.get('user_id')).first()
+        total = user.a_postion_pay * hours
+        return total 
+    else:
+        return 0 
+def container_a_position_pay(hours):
+        user = User.query.filter(User.id == session.get('user_id')).first()
+        total = user.a_postion_pay * hours
+        return total 
+
+def override_pay(overrides):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = user.override_pay * overrides
+    return total 
+
+def tafb_pay(tafb):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = user.per_diem_pay * tafb
+    return total
+def int_tafb_pay(tafb):
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    total = user.international_per_diem_pay * tafb
+    return total
+#===========================Totals=========================
+def totals(*hours):
+    sum = 0 
+    for n in hours:
+        sum = sum + n
+    return sum
+#=====================================================================
 
 @app.route('/')
 def index():
@@ -239,7 +326,6 @@ class YearsById(Resource):
             return response_dict, 200
 api.add_resource(YearsById, '/years/<int:id>')
 
-
 class Months(Resource):
     def get(self):
         months =[m.to_dict() for m in Month.query.all()]
@@ -317,17 +403,6 @@ class MonthsById(Resource):
             return response_dict, 200
 api.add_resource(MonthsById, '/months/<int:id>')
 
-# functions
-# def total_week(newPair):
-#     n = Day.query.filter_by(pairing_id = newPair)
-#     total = 0
-#     print(n)
-#     for day in n:
-#         total += day.total_tfp
-#     print(total)
-#     return total
-
-
 class Pairings(Resource):
     def get(self):
         pairings =[p.to_dict() for p in Pairing.query.all()]
@@ -337,29 +412,80 @@ class Pairings(Resource):
         try:
             new_pairing = Pairing(
                 pairing_name = request_obj["pairing_name"],
-                tafb_total = request_obj["tafb_total"],
-                int_tafb_total = request_obj["int_tafb_total"],
-                reserve_block = request_obj["reserve_block"],
                 month_id = request_obj["month_id"],
 
-                pairing_tfp = request_obj["pairing_tfp"],
-                pairing_vja = request_obj["pairing_vja"],
-                pairing_holiday = request_obj["pairing_holiday"],
-                pairing_time_half = request_obj["pairing_time_half"],
-                pairing_double_time = request_obj["pairing_double_time"],
-                pairing_double_half = request_obj["pairing_double_half"],
-                pairing_triple = request_obj["pairing_triple"],
-                pairing_overrides = request_obj["pairing_overrides"],
-                pairing_a_hours = request_obj["pairing_a_hours"],
-                pairing_duty_hours = request_obj["pairing_duty_hours"],
-                pairing_vacation_sick = request_obj["pairing_vacation_sick"],
                 
+                #=============TAFB
+                tafb_total = request_obj["tafb_total"],
+                tafb_pay = tafb_pay(request_obj["tafb_total"]),
+                #=============TAFB
+                int_tafb_total = request_obj["int_tafb_total"],
+                int_tafb_pay = int_tafb_pay(request_obj["int_tafb_total"]),
+                #================TFP LYFE
+                pairing_tfp = request_obj["pairing_tfp"],
+                pairing_tfp_pay = tfp_pay_function(request_obj["pairing_tfp"]),
+                #================ VACATION/SICK LYFE
+                pairing_vacation_sick = request_obj["pairing_vacation_sick"],
+                pairing_vacation_sick_pay = tfp_pay_function(request_obj["pairing_vacation_sick"]),
+                #================VJA LYFE
+                pairing_vja = request_obj["pairing_vja"],
+                pairing_vja_rated= one_point_five_rate(request_obj["pairing_vja"]),
+                pairing_vja_pay= one_point_five_pay(request_obj["pairing_vja"]),
+                #================ HOLIDAY LYFE
+                pairing_holiday = request_obj["pairing_holiday"],
+                pairing_holiday_rated = one_point_five_rate(request_obj["pairing_holiday"]),
+                pairing_holiday_pay = one_point_five_pay(request_obj["pairing_holiday"]),
+                #================ TIME_HALF
+                pairing_time_half = request_obj["pairing_time_half"],
+                pairing_time_half_rated = one_point_five_rate(request_obj["pairing_time_half"]),
+                pairing_time_half_pay = one_point_five_pay(request_obj["pairing_time_half"]),
+                #================ DOUBLE TIME LYFE
+                pairing_double_time = request_obj["pairing_double_time"],
+                pairing_double_time_rated = more_better_function_rate(request_obj["pairing_double_time"],2),
+                pairing_double_time_pay = more_better_function_pay(request_obj["pairing_double_time"],2),
+                #================ DOUBLE & HALF LYFE
+                pairing_double_half = request_obj["pairing_double_half"],
+                pairing_double_half_rated = more_better_function_rate(request_obj["pairing_double_half"],2.5),
+                pairing_double_half_pay = more_better_function_pay(request_obj["pairing_double_half"],2.5),
+                #================ TRIPLE LYFE
+                pairing_triple = request_obj["pairing_triple"],
+                pairing_triple_rated = more_better_function_rate(request_obj["pairing_triple"],3),
+                pairing_triple_pay = more_better_function_pay(request_obj["pairing_triple"],3),
+                #================ OVERRIDES LYFE
+                pairing_overrides = request_obj["pairing_overrides"],
+                pairing_overrides_pay = override_pay(request_obj["pairing_overrides"]),
+                #================ A-POSITION LYFE
+                pairing_a_hours = request_obj["pairing_a_hours"],
+                pairing_a_pay = container_a_position_pay(request_obj["pairing_a_hours"]),
+
+                 #===============Reserve Stuff 
+                reserve_block = request_obj["reserve_block"],
+
+                #hella need some function here!!!!!!!!!!!!!!!!!!
+                pairing_guarantee_hours = request_obj["pairing_guarantee_hours"],
+
+                
+                
+                #===============Hours that can be subtraced from guarantee on frontend
+                pairing_guarantee_hours_worked_rated = totals(request_obj["pairing_tfp"],request_obj["pairing_vacation_sick"],one_point_five_rate(request_obj["pairing_vja"]),one_point_five_rate(request_obj["pairing_holiday"]),one_point_five_rate(request_obj["pairing_time_half"]),more_better_function_rate(request_obj["pairing_double_time"],2),more_better_function_rate(request_obj["pairing_double_half"],2.5),more_better_function_rate(request_obj["pairing_triple"],3)) if request_obj["reserve_block"] else 0,
+
+
+
+                
+                #============Totals ACTUAL 
+                pairing_total_credits = totals(request_obj["pairing_tfp"],request_obj["pairing_vacation_sick"],request_obj["pairing_vja"],request_obj["pairing_holiday"],request_obj["pairing_time_half"],request_obj["pairing_double_time"],request_obj["pairing_double_half"],request_obj["pairing_triple"]),
+                #============Totals RATED 
+                pairing_total_credits_rated = totals(request_obj["pairing_tfp"],request_obj["pairing_vacation_sick"],one_point_five_rate(request_obj["pairing_vja"]),one_point_five_rate(request_obj["pairing_holiday"]),one_point_five_rate(request_obj["pairing_time_half"]),more_better_function_rate(request_obj["pairing_double_time"],2),more_better_function_rate(request_obj["pairing_double_half"],2.5),more_better_function_rate(request_obj["pairing_triple"],3)),
+                #============Totals PAY 
+                pairing_total_pay = totals(tfp_pay_function(request_obj["pairing_tfp"]),tfp_pay_function(request_obj["pairing_vacation_sick"]),one_point_five_pay(request_obj["pairing_vja"]),one_point_five_pay(request_obj["pairing_holiday"]),one_point_five_pay(request_obj["pairing_time_half"]),more_better_function_pay(request_obj["pairing_double_time"],2),more_better_function_pay(request_obj["pairing_double_half"],2.5),more_better_function_pay(request_obj["pairing_triple"],3), tafb_pay(request_obj["tafb_total"]),int_tafb_pay(request_obj["int_tafb_total"]),override_pay(request_obj["pairing_overrides"]),container_a_position_pay(request_obj["pairing_a_hours"])),
+                #============Totals DUTY HOURS 
+                pairing_duty_hours = request_obj["pairing_duty_hours"],
+                #========New additions=======
+
             )
             db.session.add(new_pairing)
             db.session.commit()
-            # new_pairing.pairing_tfp = total_week(new_pairing.id)
-            # db.session.add(new_pairing)
-            # db.session.commit()
+   
         except Exception as e:
             message = {'errors': [e.__str__()]}
             return make_response(message, 422)
@@ -386,10 +512,81 @@ class PairingsById(Resource):
         else:
             request_object = request.get_json()
             try:
+                #keys to exclude======
+
+                #=====================
+                
                 for attr in request_object:
                     setattr(response_obj, attr, request_object[attr])
-                    db.session.add(response_obj)
-                    db.session.commit()
+                #New shit ============
+                #============VACATION/SICK
+                if "pairing_vacation_sick" in request_object:
+                    response_obj.pairing_vacation_sick_pay = tfp_pay_function(request_object["pairing_vacation_sick"])
+                #============REGULAR TFP
+                if "pairing_tfp" in request_object:
+                    response_obj.pairing_tfp_pay = tfp_pay_function(request_object["pairing_tfp"])
+                #============VJA
+                if "pairing_vja" in request_object:
+                    response_obj.pairing_vja_rated = one_point_five_rate(request_object["pairing_vja"])
+                    response_obj.pairing_vja_pay = one_point_five_pay(request_object["pairing_vja"])
+                #============HOLIDAY
+                if "pairing_holiday" in request_object:
+                    response_obj.pairing_holiday_rated = one_point_five_rate(request_object["pairing_holiday"])
+                    response_obj.pairing_holiday_pay = one_point_five_pay(request_object["pairing_holiday"])
+                #============TIME_HALF
+                if "pairing_time_half" in request_object:
+                    response_obj.pairing_time_half_rated  = one_point_five_rate(request_object["pairing_time_half"])
+                    response_obj.pairing_time_half_pay = one_point_five_pay(request_object["pairing_time_half"])
+                #============DOUBLE_TIME
+                if "pairing_double_time" in request_object:
+                    response_obj.pairing_double_time_rated = double_rate(request_object["pairing_double_time"])
+                    response_obj.pairing_double_time_pay = double_pay(request_object["pairing_double_time"])
+                #============DOUBLE_HALF
+                if "pairing_double_half" in request_object:
+                    response_obj.pairing_double_half_rated = double_point_five_rate(request_object["pairing_double_half"])
+                    response_obj.pairing_double_half_pay = double_point_five_pay(request_object["pairing_double_half"])
+                #============TRIPLE
+                if "pairing_triple" in request_object:
+                    response_obj.pairing_triple_rated = triple_rate(request_object["pairing_triple"])
+                    response_obj.pairing_triple_pay = triple_pay(request_object["pairing_triple"])
+                #============OVERRIDES
+                response_obj.pairing_overrides_pay = override_pay(request_object["pairing_overrides"])
+                #============A-POSITON
+                if "pairing_a_hours" in request_object:
+                    response_obj.pairing_a_pay = container_a_position_pay(request_object["pairing_a_hours"])
+                #=============TAFB
+                response_obj.tafb_pay = tafb_pay(request_object["tafb_total"])
+                response_obj.int_tafb_pay = int_tafb_pay(request_object["int_tafb_total"])
+
+
+                #===============Reserve Stuff 
+                response_obj.reserve_block = request_object["reserve_block"]
+
+
+                #===============Reserve GUARANTEE HOURS 
+                if "reserve_block" in request_object:
+                    day_count = Day.query.filter_by(pairing_id=response_obj.id).count()
+                    if request_object["reserve_block"]:
+                        response_obj.pairing_guarantee_hours = 6 * day_count
+                    else:
+                        response_obj.pairing_guarantee_hours = 0
+                
+                #===============Reserve  WORKED TOWARDS GUARANTEE  
+                response_obj.pairing_guarantee_hours_worked_rated = totals(request_object["pairing_tfp"],request_object["pairing_vacation_sick"],one_point_five_rate(request_object["pairing_vja"]),one_point_five_rate(request_object["pairing_holiday"]),one_point_five_rate(request_object["pairing_time_half"]),more_better_function_rate(request_object["pairing_double_time"],2),more_better_function_rate(request_object["pairing_double_half"],2.5),more_better_function_rate(request_object["pairing_triple"],3)) if request_object["reserve_block"] else 0
+
+
+
+                #============Totals ACTUAL 
+                response_obj.pairing_total_credits = totals(request_object["pairing_tfp"],request_object["pairing_vacation_sick"],request_object["pairing_vja"],request_object["pairing_holiday"],request_object["pairing_time_half"],request_object["pairing_double_time"],request_object["pairing_double_half"],request_object["pairing_triple"])
+                #============Totals RATED
+                response_obj.pairing_total_credits_rated= totals(request_object["pairing_tfp"],request_object["pairing_vacation_sick"],one_point_five_rate(request_object["pairing_vja"]),one_point_five_rate(request_object["pairing_holiday"]),one_point_five_rate(request_object["pairing_time_half"]),more_better_function_rate(request_object["pairing_double_time"],2),more_better_function_rate(request_object["pairing_double_half"],2.5),more_better_function_rate(request_object["pairing_triple"],3))
+                #============Totals PAY
+                response_obj.pairing_total_pay = totals(tfp_pay_function(request_object["pairing_tfp"]),tfp_pay_function(request_object["pairing_vacation_sick"]),one_point_five_pay(request_object["pairing_vja"]),one_point_five_pay(request_object["pairing_holiday"]),one_point_five_pay(request_object["pairing_time_half"]),more_better_function_pay(request_object["pairing_double_time"],2),more_better_function_pay(request_object["pairing_double_half"],2.5),more_better_function_pay(request_object["pairing_triple"],3), tafb_pay(request_object["tafb_total"]),int_tafb_pay(request_object["int_tafb_total"]),override_pay(request_object["pairing_overrides"]),container_a_position_pay(request_object["pairing_a_hours"]))
+                #=====================
+
+
+                db.session.add(response_obj)
+                db.session.commit()
             except Exception as e:
                 message = {'errors': [e.__str__()]}
                 return make_response(message, 422)
@@ -410,72 +607,6 @@ api.add_resource(PairingsById, '/pairings/<int:id>')
 
 
 
-
-# region Day Math Functions
-#======================DAY MATH========================================
-def tfp_pay_function(total_tfp):
-    user = User.query.filter(User.id == session.get('user_id')).first()
-    total = user.tfp_pay * total_tfp
-    print(total) 
-    return round(total, 2) 
-#===========================1.5=======================================
-def one_point_five_rate(tfp):
-    total = tfp * 1.5
-    return total
-def one_point_five_pay(tfp):
-    user = User.query.filter(User.id == session.get('user_id')).first()
-    total = (tfp * 1.5)* user.tfp_pay
-    return round(total, 2)
-#===========================2=======================================
-def double_rate(tfp):
-    total = tfp * 2
-    return total
-def double_pay(tfp):
-    user = User.query.filter(User.id == session.get('user_id')).first()
-    total = (tfp * 2)* user.tfp_pay
-    return round(total, 2)
-#===========================2.5=======================================
-def double_point_five_rate(tfp):
-    total = tfp * 2.5
-    return total
-def double_point_five_pay(tfp):
-    user = User.query.filter(User.id == session.get('user_id')).first()
-    total = (tfp * 2.5)* user.tfp_pay
-    return round(total, 2)
-#===========================3=======================================
-def triple_rate(tfp):
-    total = tfp * 3
-    return total
-def triple_pay(tfp):
-    user = User.query.filter(User.id == session.get('user_id')).first()
-    total = (tfp * 3)* user.tfp_pay
-    return round(total, 2)
-#===========================A_Pay and Overrides=========================
-def a_position_hours(*hours):
-    sum = 0 
-    for n in hours:
-        sum = sum + n
-    return sum
-def a_position_pay(position, hours):
-    if position:
-        user = User.query.filter(User.id == session.get('user_id')).first()
-        total = user.a_postion_pay * hours
-        return total 
-    else:
-        return 0 
-
-def override_pay(overrides):
-    user = User.query.filter(User.id == session.get('user_id')).first()
-    total = user.override_pay * overrides
-    return total 
-#===========================Totals=========================
-def totals(*hours):
-    sum = 0 
-    for n in hours:
-        sum = sum + n
-    return sum
-#=====================================================================
-# endregion
 class Days(Resource):
     def get(self):
         days =[d.to_dict() for d in Day.query.all()]
@@ -588,7 +719,6 @@ class DaysById(Resource):
                                 "total_credits_rated",
                                 "total_pay"
                                 ]
-       
                 for attr in request_object:
                     if attr not in keys_to_exclude:
                         setattr(response_obj, attr, request_object[attr])
@@ -627,7 +757,9 @@ class DaysById(Resource):
                 response_obj.overrides_pay = override_pay(request_object["overrides"])
                 #============A-POSITON
                 response_obj.a_position = request_object["a_position"]
+
                 response_obj.a_hours = totals(request_object["total_tfp"],request_object["vacation_sick"],request_object["vja"],request_object["holiday"],request_object["time_half"],request_object["double_time"],request_object["double_half"],request_object["triple"]) if request_object["a_position"] else 0
+                
                 response_obj.a_pay = a_position_pay(request_object["a_position"],totals(request_object["total_tfp"],request_object["vacation_sick"],request_object["vja"],request_object["holiday"],request_object["time_half"],request_object["double_time"],request_object["double_half"],request_object["triple"]))
 
                 #============Totals ACTUAL 
@@ -642,20 +774,116 @@ class DaysById(Resource):
                 db.session.add(response_obj)
                 db.session.commit()
 
-
+#======================CASCADE PATCH STUFF=======================================================
                 all_days = Day.query.filter_by(pairing_id=response_obj.pairing_id)
-                # print("all days" , all_days)
-                total = 0
-                for days in all_days:
-                    if days.total_pay != None:
-                        total += days.total_pay
-                    print(days.total_pay)
-                    print(days.date)
-                print(total)
-                
-                cascade_patch_pairing = Pairing.query.filter_by(id=response_obj.pairing_id).first()
-                print("this it the pairing", cascade_patch_pairing)
+                         # region Comments
+                        # ============ SHE DONE ON DAY TO PAIRING LEVEL
+                        # # "holiday"
+                        # # "total_tfp"
+                        ##==========================================
 
+                        # "a_hours": 1.0,
+                        # # "a_pay": null,
+                            
+                        # # "daily_duty_hours": 1.0,  
+                            
+                        # # "double_half": 1.0,
+                        # # "double_half_pay": null,
+                        # # "double_half_rated": null
+                            
+                        # # "double_time": 1.0,
+                        # # "double_time_pay": null,
+                        # # "double_time_rated": null, 
+                            
+                        # # "holiday_pay": null,
+                        # # "holiday_rated": null, 
+                            
+                        # # "overrides": 3,
+                        # # "overrides_pay": null,
+                        
+                        # # "reserve_no_fly": false,  
+                            
+                        # # "time_half": 1.0,
+                        # # "time_half_pay": null,
+                        # # "time_half_rated": null,  
+                            
+                        # # "total_credits": null,
+                        # # "total_credits_rated": null,
+                        # # "total_pay": null, 
+                       
+                        # # "total_tfp_pay": null,
+                         
+                        # # "triple": 1.0,
+                        # # "triple_pay": null,
+                        # # "triple_rated": null,
+                            
+                        # # "vacation_sick": 1.0,
+                        # # "vacation_sick_pay": null,
+                            
+                        # # "vja": 1.0,
+                        # # "vja_pay": null,
+                        # # "vja_rated": null
+                        # """
+                        # endregion
+                #============REGULAR TFP
+                sum_total_tfp = 0
+                #============VACATION/SICK
+                sum_vacation_sick = 0
+                #============VJA
+                sum_vja = 0
+                #============HOLIDAY
+                sum_holiday = 0
+
+                for days in all_days:
+                    if days.total_tfp != None:
+                        sum_total_tfp += days.total_tfp
+                    if days.vacation_sick != None:
+                        sum_vacation_sick += days.vacation_sick
+                    if days.vja != None:
+                        sum_vja += days.vja
+                    if days.holiday != None:
+                        sum_holiday += days.holiday
+
+        pairing_id = response_obj.pairing_id  # Assuming the pairing_id is known from the 'day' object
+        pairing_payload = {
+            'pairing_tfp': response_obj.sum_total_tfp  # Updating the 'pairing_tfp' field with the calculated value from the 'day' object
+        }
+
+        # Make the patch request to update the 'cascade_patch_pairing' object
+        pairing_response = requests.patch(f'https://api-endpoint/pairings/{pairing_id}', json=pairing_payload)
+
+        # Handle response and error cases for the 'cascade_patch_pairing' patch request
+        if pairing_response.status_code == 200:
+            print("Patch request for 'cascade_patch_pairing' object successful")
+        else:
+            print("Patch request for 'cascade_patch_pairing' object failed with status code:", pairing_response.status_code)
+                
+                
+                # cascade_patch_pairing = Pairing.query.filter_by(id=response_obj.pairing_id).first()
+                # cascade_patch_pairing.pairing_tfp = sum_total_tfp
+                # cascade_patch_pairing.pairing_vacation_sick = sum_vacation_sick
+                # cascade_patch_pairing.pairing_vja = sum_vja
+                # cascade_patch_pairing.pairing_holiday = sum_holiday
+
+                # db.session.add(cascade_patch_pairing)
+                # db.session.commit()
+
+
+
+                # print(cascade_patch_pairing)
+                # all_cascade_patch_pairing =Pairing.query.filter_by(month_id=cascade_patch_pairing.month_id)
+                # for pairing in all_cascade_patch_pairing:
+
+                #     print(pairing, 'total all these')
+                
+                # cascade_patch_month = Month.query.filter_by(id=cascade_patch_pairing.month_id).first()
+                # print(cascade_patch_month)
+                # all_cascade_patch_month =Month.query.filter_by(year_id=cascade_patch_month.year_id)
+                # for month in all_cascade_patch_month:
+                #     print(month, 'total all these')
+
+                # cascade_patch_year = Year.query.filter_by(id=cascade_patch_month.year_id).first()
+                # print(cascade_patch_year)
 
 
             except Exception as e:
