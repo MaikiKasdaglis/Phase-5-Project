@@ -65,7 +65,7 @@ def create_months():
         m = Month(
             month = fake.month(), 
             year = random.choice([2023, 2022]),
-            guarantee_hours = fake.random_int(min=0, max=72),
+            month_guarantee_hours = fake.random_int(min=0, max=72),
             year_id = fake.random_int(min=1, max=15),
 
             month_tfp = 10,

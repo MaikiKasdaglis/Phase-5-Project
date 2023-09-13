@@ -16,19 +16,13 @@ nav a.active {
 .custom-carousel .carousel-control-prev-icon,
 .custom-carousel .carousel-control-next-icon {
   background-color: black;
-  /* Additional styles if needed */
 }
 
 .custom-carousel .carousel-control-prev,
 .custom-carousel .carousel-control-next {
   color: black;
-  /* Additional styles if needed */
 }
-/* .card-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: scroll;
-} */
+
 ul {
   text-align: left;
 }
@@ -39,4 +33,16 @@ ul {
 
 .col {
   flex: 1;
+}
+
+.carousel-indicators li {
+  background-color: #555;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
+}
+
+.carousel-indicators .active {
+  background-color: #555;
 }

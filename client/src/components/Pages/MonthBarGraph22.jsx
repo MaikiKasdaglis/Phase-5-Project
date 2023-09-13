@@ -2,12 +2,12 @@
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
-const DaysBarGraph = ({ days }) => {
-  // console.log(`from bar graph`, days);
-  const labelsArray = days.map((day) => day.date);
-  // console.log(`labels array`, labelsArray);
-  const payArray = days.map((day) => day.total_pay);
-
+const MonthBarGraph = ({ betterPairings }) => {
+  console.log(`these are pairings`, betterPairings);
+  const labelsArray = betterPairings.map((pairing) => pairing.pairing_name);
+  console.log(`these are pairings name`, labelsArray);
+  const payArray = betterPairings.map((pairing) => pairing.pairing_total_pay);
+  console.log(`these are pairings pay`, payArray);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const DaysBarGraph = ({ days }) => {
         labels: labelsArray,
         datasets: [
           {
-            label: "Day Total Pay",
+            label: "Bar Graph",
             data: payArray,
             backgroundColor: "rgba(75, 192, 192, 0.6)",
             borderColor: "rgba(75, 192, 192, 1)",
@@ -40,4 +40,4 @@ const DaysBarGraph = ({ days }) => {
   return <canvas ref={chartRef} />;
 };
 
-export default DaysBarGraph;
+export default MonthBarGraph;

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "chartjs-plugin-labels": "^1.1.0",
+    "formik": "^2.4.4",
+    "yup": "^1.2.0"
+  }
+}

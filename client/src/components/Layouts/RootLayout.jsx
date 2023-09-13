@@ -3,8 +3,13 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import useUserStore from "../../hooks/useStore";
 
 export default function RootLayout() {
+  const { user } = useUserStore();
+  const navLinkText = user ? "Logout" : "Login";
+  const navLinkTo = user ? "/logout" : "/login";
+  const welcomeMessage = user ? user.username : "Login/Signup";
   return (
     <div>
       <Navbar
@@ -19,35 +24,39 @@ export default function RootLayout() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {/* <Nav.Link href="#home">Home</Nav.Link> */}
-              <NavLink to="dashboard" className="nav-link">
-                Dashboard
-              </NavLink>
-              <Nav.Link href="#link">Link</Nav.Link>
-              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">
-                  Another action
-                </NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">
-                  Something
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">
-                  Separated link
-                </NavDropdown.Item>
-              </NavDropdown>
+              {user ? (
+                <NavLink to="dashboard" className="nav-link">
+                  Dashboard
+                </NavLink>
+              ) : null}
+              {/* {user ? <h1>hi</h1> : null} */}
+              {user ? <Nav.Link href="#link">Link</Nav.Link> : null}
+              {user ? <Nav.Link href="#link">Link</Nav.Link> : null}
+              {user ? (
+                <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+                  <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
+                  <NavDropdown.Item href="#action/3.2">
+                    Another action
+                  </NavDropdown.Item>
+                  <NavDropdown.Item href="#action/3.3">
+                    Something
+                  </NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item href="#action/3.4">
+                    Separated link
+                  </NavDropdown.Item>
+                </NavDropdown>
+              ) : null}
             </Nav>
             <Nav className="ml-auto">
               <NavDropdown
-                title="Login/Signup"
+                title={welcomeMessage}
                 id="basic-nav-dropdown"
                 className="custom-dropdown"
               >
-                <Link to="login" className="dropdown-item">
-                  Login
+                <Link to={navLinkTo} className="dropdown-item">
+                  {navLinkText}
                 </Link>
-                <Link className="dropdown-item">Test</Link>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>

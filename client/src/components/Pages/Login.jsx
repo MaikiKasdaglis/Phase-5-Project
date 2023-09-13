@@ -2,11 +2,16 @@
 import { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import useUserStore from "../../hooks/useStore";
+import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { updateUser, user } = useUserStore();
+
+  // const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -74,9 +79,19 @@ export default function Login() {
                 />
               </Form.Group>
 
-              <Button variant="primary" type="submit">
-                Submit
+              <Button variant="dark" type="submit" className="m-1 ">
+                Login
               </Button>
+
+              <Link
+                style={{ marginLeft: "5px" }}
+                className="btn btn-secondary"
+                variant="secondary"
+                to="signup"
+                activeClassName="active"
+              >
+                Signup
+              </Link>
             </Form>
           </Col>
         </Row>

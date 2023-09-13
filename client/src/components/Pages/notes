@@ -1,0 +1,66 @@
+// {
+//     "a_position": false,
+//     "comments": "",
+//     "daily_duty_hours": 0.0,
+//     "date": "Day 2",
+//     "double_half": 0.0,
+//     "double_time": 0.0,
+//     "holiday": 0.0,
+//     "overrides": 0,
+//     "pairing_id": 111,
+//     "reserve_no_fly": false,
+//     "time_half": 0.0,
+//     "total_tfp": 100.0,
+//     "triple": 0.0,
+//     "type_of_day": "TBD",
+//     "vacation_sick": 0.0,
+//     "vja": 0.0
+// }
+
+// this is all the shit that should be on a day form 
+
+
+
+// {
+//     "int_tafb_total": 0.0,
+//     "month_id": 51,
+//     "pairing_a_hours": 0.0,
+//     "pairing_double_half": 0.0,
+//     "pairing_double_time": 0.0,
+//     "pairing_duty_hours": 0.0,
+//     "pairing_holiday": 0.0,
+//     "pairing_name": "Pairing 1",
+//     "pairing_overrides": 0,
+//     "pairing_tfp": 0.0,
+//     "pairing_time_half": 0.0,
+//     "pairing_triple": 0.0,
+//     "pairing_vacation_sick": 0.0,
+//     "pairing_vja": 0.0,
+//     "reserve_block": false,
+//     "tafb_total": 0.0
+// }
+
+// all the shit that should be patched for paring. all else should be evaluated in python?? 
+
+
+
+
+// MONTH
+        {
+        "year": 2023,
+        "year_id": 1,
+        "month": "TEST NAME",
+        "month_a_hours": 0,
+        "month_double_half": 0,
+        "month_double_time": 10,
+        "month_duty_hours": 0,
+        "month_holiday": 0,
+        "month_int_tafb_total": 0,
+        "month_overrides": 0,
+        "month_tafb_total": 0,
+        "month_tfp": 10,
+        "month_time_half": 0,
+        "month_triple": 0,
+        "month_vacation_sick": 0,
+        "month_vja": 0
+        }

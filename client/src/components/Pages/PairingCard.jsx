@@ -1,12 +1,17 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
-import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Accordion from "react-bootstrap/Accordion";
 import DaysBarGraph from "./DaysBarGraph";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import ListGroup from "react-bootstrap/ListGroup";
 
 export default function PairingCard({ pairing }) {
-  console.log(pairing, `from pairing card`);
+  const [passPairing, setPassPairing] = useState({ pairing });
+  // console.log("form state", passPairing);
+  // console.log(pairing, `from pairing card`);
   const {
     int_tafb_total,
     pairing_a_hours,
@@ -31,7 +36,15 @@ export default function PairingCard({ pairing }) {
   return (
     <Card style={{ width: "18rem" }} className="m-0 p-0">
       <DaysBarGraph days={days} />
-      <Card.Body>
+      <Link
+        className="btn btn-dark rounded-0"
+        onClick={() => console.log(`this is the pairing i'm clicking`, pairing)}
+        to="pairing_dashboard"
+        state={{ passPairing: passPairing }}
+      >
+        Go somewhere
+      </Link>
+      <Card.Body className="m-0 p-1">
         <Card.Title>{`Pairing Begin: ${pairing.pairing_name}`}</Card.Title>
         <Card.Text>
           <div>
@@ -40,7 +53,7 @@ export default function PairingCard({ pairing }) {
                 <li>TAFB International: {int_tafb_total}</li>
               ) : null}
               {tafb_total ? <li>TAFB: {tafb_total}</li> : null}
-              {pairing_a_hours ? <li>A Position: {pairing_a_hours}</li> : null}
+
               {pairing_tfp ? <li>Total Regular TFP: {pairing_tfp}</li> : null}
               {pairing_holiday ? <li>Holiday: {pairing_holiday}</li> : null}
               {pairing_double_half ? (
@@ -66,6 +79,14 @@ export default function PairingCard({ pairing }) {
                 <li> pairing_duty_hours: {pairing_duty_hours}</li>
               ) : null}
             </ul>
+            <ListGroup>
+              {" "}
+              {pairing_a_hours ? (
+                <ListGroup.Item action variant="light">
+                  A Position: {pairing_a_hours}
+                </ListGroup.Item>
+              ) : null}
+            </ListGroup>
           </div>
         </Card.Text>
         <Accordion flush>
@@ -119,7 +140,6 @@ export default function PairingCard({ pairing }) {
             </Accordion.Item>
           ))}
         </Accordion>
-        {/* <Button variant="primary">Go somewhere</Button> */}
       </Card.Body>
     </Card>
   );
