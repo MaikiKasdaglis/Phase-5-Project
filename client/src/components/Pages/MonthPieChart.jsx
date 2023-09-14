@@ -20,19 +20,19 @@ export default function MonthPieChart({ betterMonth }) {
   } = betterMonth;
   const data = {
     labels: [
-      "month_a_pay",
-      "month_double_half_pay",
-      "month_double_time_pay",
-      "month_holiday_pay",
-      "month_tafb_pay",
-      "month_int_tafb_pay",
-      "month_overrides_pay",
-      "month_reserve_no_fly_pay",
-      "month_tfp_pay",
-      "month_time_half_pay",
-      "month_triple_pay",
-      "month_vacation_sick_pay",
-      "month_vja_pay",
+      `A Pay $${month_a_pay}`,
+      `Double & Half Pay $${month_double_half_pay}`,
+      `Double Time $${month_double_time_pay}`,
+      `Holiday Pay $${month_holiday_pay}`,
+      `TAFB Pay $${month_tafb_pay}`,
+      `Int. TAFB Pay $${month_int_tafb_pay}`,
+      `Overrides Pay $${month_overrides_pay}`,
+      `No Fly Reserve Pay $${month_reserve_no_fly_pay}`,
+      `Regular TFP $${month_tfp_pay}`,
+      `Overtime $${month_time_half_pay}`,
+      `Triple Time $${month_triple_pay}`,
+      `Vacation/Sick $${month_vacation_sick_pay}`,
+      `VJA Pay $${month_vja_pay}`,
     ],
     datasets: [
       {

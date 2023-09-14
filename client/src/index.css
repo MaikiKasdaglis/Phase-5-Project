@@ -35,14 +35,6 @@ ul {
   flex: 1;
 }
 
-.carousel-indicators li {
-  background-color: #555;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  margin: 0 5px;
-}
-
-.carousel-indicators .active {
-  background-color: #555;
+.carousel-indicators {
+  display: none;
 }

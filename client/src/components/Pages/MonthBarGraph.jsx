@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import { Bar } from "react-chartjs-2";
+// import { useEffect } from "react";
 
-export default function MonthBarGraph({ betterMonth }) {
+export default function MonthBarGraph({ betterMonth, refresh }) {
   const betterPairings = betterMonth.pairings_field;
   const labelsArray = betterPairings.map((pairing) => pairing.pairing_name);
   const payArray = betterPairings.map((pairing) => pairing.pairing_total_pay);
@@ -43,6 +44,11 @@ export default function MonthBarGraph({ betterMonth }) {
       },
     },
   };
+  // useEffect(() => {
+  //   // This effect will be triggered whenever the refresh prop changes
+  //   // You can perform any necessary actions here
+  //   console.log("OtherComponent has been refreshed");
+  // }, [refresh]);
 
   return (
     <div className="mt-3">

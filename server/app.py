@@ -19,7 +19,7 @@ import requests
 def tfp_pay_function(total_tfp):
     user = User.query.filter(User.id == session.get('user_id')).first()
     total = user.tfp_pay * total_tfp
-    print(total) 
+    # print(total) 
     return round(total, 2) 
 
 def more_better_function_rate(tfp, rate):
@@ -28,7 +28,7 @@ def more_better_function_rate(tfp, rate):
 def more_better_function_pay(total_tfp, rate):
     user = User.query.filter(User.id == session.get('user_id')).first()
     total = user.tfp_pay * (total_tfp * rate)
-    print(total) 
+    # print(total) 
     return round(total, 2) 
 
 #===========================1.5=======================================
@@ -666,7 +666,30 @@ class Pairings(Resource):
             )
             db.session.add(new_pairing)
             db.session.commit()
-   
+            day_names = ["Day 1", "Day 2", "Day 3"]
+            for day in range(3):
+                new_day = Day(
+                    pairing_id=new_pairing.id,
+                    date=day_names[day],
+                    total_tfp=0,
+                    vja= 0,
+                    holiday= 0,
+                    time_half= 0,
+                    double_time= 0,
+                    double_half= 0,
+                    triple= 0,
+                    a_hours = 0,
+                    overrides=0,
+                    reserve_no_fly=False,
+                    a_position = False,
+                    daily_duty_hours = 0,
+                    vacation_sick = 0,
+                    comments = '',
+                    type_of_day =  'TBD'
+                )
+                db.session.add(new_day)
+                db.session.commit()
+
         except Exception as e:
             message = {'errors': [e.__str__()]}
             return make_response(message, 422)
@@ -768,20 +791,267 @@ class PairingsById(Resource):
                 db.session.commit()
 
                 all_cascade_patch_pairing =Pairing.query.filter_by(month_id=response_obj.month_id)
+                     #===============Reserve Stuff 
                 sum_pairing_guarantee_hours = 0
                 sum_pairing_guarantee_hours_worked_rated = 0
+                #=============TAFB
+                sum_tafb_total = 0
+                sum_int_tafb_total = 0
+                #============REGULAR TFP
+                sum_pairing_tfp = 0
+                #============VACATION/SICK
+                sum_pairing_vacation_sick = 0
+                #============VJA
+                sum_pairing_vja = 0
+                #============HOLIDAY
+                sum_pairing_holiday = 0
+                #============time_half
+                sum_pairing_time_half = 0
+                #================ DOUBLE TIME LYFE
+                sum_pairing_double_time = 0
+                #================ DOUBLE & HALF LYFE
+                sum_pairing_double_half = 0
+                #================ TRIPLE LYFE
+                sum_pairing_triple = 0
+                #================ OVERRIDES LYFE
+                sum_pairing_overrides = 0
+                #================ A-POSITION LYFE
+                sum_pairing_a_hours = 0
+                #============Totals
+                sum_pairing_total_credits = 0
+                #========New additions=======
+                sum_pairing_duty_hours = 0
+                sum_pairing_reserve_no_fly_hours =0
+
                 for pairing in all_cascade_patch_pairing:
                     if pairing.pairing_guarantee_hours != None:
-                            sum_pairing_guarantee_hours += pairing.pairing_guarantee_hours
+                        sum_pairing_guarantee_hours += pairing.pairing_guarantee_hours
                     if pairing.pairing_guarantee_hours_worked_rated != None:
                         sum_pairing_guarantee_hours_worked_rated += pairing.pairing_guarantee_hours_worked_rated
+                    if pairing.tafb_total != None:
+                        sum_tafb_total += pairing.tafb_total
+                    if pairing.int_tafb_total != None:
+                        sum_int_tafb_total += pairing.int_tafb_total
+                    if pairing.pairing_tfp != None:
+                        sum_pairing_tfp += pairing.pairing_tfp
+                    if pairing.pairing_vacation_sick != None:
+                        sum_pairing_vacation_sick += pairing.pairing_vacation_sick
+                    if pairing.pairing_vja != None:
+                        sum_pairing_vja += pairing.pairing_vja
+                    if pairing.pairing_holiday != None:
+                        sum_pairing_holiday += pairing.pairing_holiday
+                    if pairing.pairing_time_half != None:
+                        sum_pairing_time_half += pairing.pairing_time_half
+                    if pairing.pairing_double_time != None:
+                        sum_pairing_double_time += pairing.pairing_double_time
+                    if pairing.pairing_double_half != None:
+                        sum_pairing_double_half += pairing.pairing_double_half
+                    if pairing.pairing_triple != None:
+                        sum_pairing_triple += pairing.pairing_triple
+                    if pairing.pairing_overrides != None:
+                        sum_pairing_overrides += pairing.pairing_overrides
+                    if pairing.pairing_a_hours != None:
+                        sum_pairing_a_hours += pairing.pairing_a_hours
+                    if pairing.pairing_total_credits != None:
+                        sum_pairing_total_credits += pairing.pairing_total_credits
+                    if pairing.pairing_duty_hours != None:
+                        sum_pairing_duty_hours += pairing.pairing_duty_hours
+                    if pairing.pairing_reserve_no_fly_hours != None:
+                        sum_pairing_reserve_no_fly_hours += pairing.pairing_reserve_no_fly_hours
 
                 cascade_patch_month = Month.query.filter_by(id=response_obj.month_id).first()
 
+                #========New additions=======
+                cascade_patch_month.month_duty_hours = sum_pairing_duty_hours
+                #=============TAFB
+                cascade_patch_month.month_tafb_total = sum_tafb_total
+                cascade_patch_month.month_tafb_pay = tafb_pay(sum_tafb_total)
+                #=============TAFB INT
+                cascade_patch_month.month_int_tafb_total = sum_int_tafb_total
+                cascade_patch_month.month_int_tafb_pay = int_tafb_pay(sum_int_tafb_total)
+                #============VACATION/SICK
+                cascade_patch_month.month_vacation_sick = sum_pairing_vacation_sick
+                cascade_patch_month.month_vacation_sick_pay = tfp_pay_function(sum_pairing_vacation_sick)
+                #============REGULAR TFP
+                cascade_patch_month.month_tfp = sum_pairing_tfp
+                cascade_patch_month.month_tfp_pay = tfp_pay_function(sum_pairing_tfp)
+                #============VJA
+                cascade_patch_month.month_vja = sum_pairing_vja
+                cascade_patch_month.month_vja_rated= one_point_five_rate(sum_pairing_vja)
+                cascade_patch_month.month_vja_pay= one_point_five_pay(sum_pairing_vja)
+                # #============HOLIDAY
+                cascade_patch_month.month_holiday = sum_pairing_holiday
+                cascade_patch_month.month_holiday_rated= double_rate(sum_pairing_holiday)
+                cascade_patch_month.month_holiday_pay= double_pay(sum_pairing_holiday)
+                #============TIME_HALF
+                cascade_patch_month.month_time_half = sum_pairing_time_half
+                cascade_patch_month.month_time_half_rated= one_point_five_rate(sum_pairing_time_half)
+                cascade_patch_month.month_time_half_pay= one_point_five_pay(sum_pairing_time_half)
+                #============DOUBLE_TIME
+                cascade_patch_month.month_double_time = sum_pairing_double_time
+                cascade_patch_month.month_double_time_rated= more_better_function_rate(sum_pairing_double_time,2)
+                cascade_patch_month.month_double_time_pay= more_better_function_pay(sum_pairing_double_time,2)
+                #============DOUBLE_HALF
+                cascade_patch_month.month_double_half = sum_pairing_double_half
+                cascade_patch_month.month_double_half_rated= more_better_function_rate(sum_pairing_double_half,2.5)
+                cascade_patch_month.month_double_half_pay= more_better_function_pay(sum_pairing_double_half,2.5)
+                #============TRIPLE
+                cascade_patch_month.month_triple = sum_pairing_triple
+                cascade_patch_month.month_triple_rated= more_better_function_rate(sum_pairing_triple,3)
+                cascade_patch_month.month_triple_pay= more_better_function_pay(sum_pairing_triple,3)
+                #============OVERRIDES
+                cascade_patch_month.month_overrides = sum_pairing_overrides
+                cascade_patch_month.month_overrides_pay = override_pay(sum_pairing_overrides)
+                #============A-POSITON
+                cascade_patch_month.month_a_hours = sum_pairing_a_hours
+                cascade_patch_month.month_a_pay = container_a_position_pay(sum_pairing_a_hours)
+                # #===============Reserve NO FLY HOURS 
+                cascade_patch_month.month_reserve_no_fly_hours = sum_pairing_reserve_no_fly_hours
+                cascade_patch_month.month_reserve_no_fly_pay = tfp_pay_function(sum_pairing_reserve_no_fly_hours)
+                # #===============Reserve GUARANTEE HOURS 
                 cascade_patch_month.month_guarantee_hours = sum_pairing_guarantee_hours
                 cascade_patch_month.month_guarantee_hours_worked_rated = sum_pairing_guarantee_hours_worked_rated
+                #============Totals ACTUAL 
+                cascade_patch_month.month_total_credits = totals(sum_pairing_reserve_no_fly_hours,sum_pairing_tfp,sum_pairing_vacation_sick,sum_pairing_vja,sum_pairing_holiday,sum_pairing_time_half,sum_pairing_double_time,sum_pairing_double_half,sum_pairing_triple)
+                #============Totals RATED
+                cascade_patch_month.month_total_credits_rated= totals(sum_pairing_reserve_no_fly_hours,sum_pairing_tfp,sum_pairing_vacation_sick,one_point_five_rate(sum_pairing_vja),double_rate(sum_pairing_holiday),one_point_five_rate(sum_pairing_time_half),more_better_function_rate(sum_pairing_double_time,2),more_better_function_rate(sum_pairing_double_half,2.5),more_better_function_rate(sum_pairing_triple,3))
+                #============Totals PAY
+                cascade_patch_month.month_total_pay = totals(tfp_pay_function(sum_pairing_reserve_no_fly_hours),tfp_pay_function(sum_pairing_tfp),tfp_pay_function(sum_pairing_vacation_sick),one_point_five_pay(sum_pairing_vja),double_pay(sum_pairing_holiday),one_point_five_pay(sum_pairing_time_half),more_better_function_pay(sum_pairing_double_time,2),more_better_function_pay(sum_pairing_double_half,2.5),more_better_function_pay(sum_pairing_triple,3), tafb_pay(sum_tafb_total),int_tafb_pay(sum_int_tafb_total),override_pay(sum_pairing_overrides),container_a_position_pay(sum_pairing_a_hours))
+                    # #=====================
                 db.session.add(cascade_patch_month)
                 db.session.commit()
+              
+                # THIS IS THE QUERY FOR ALL RELATED MONTHS
+                all_cascade_patch_month = Month.query.filter_by(year_id=cascade_patch_month.year_id)
+                #========New additions=======
+                sum_month_duty_hours = 0
+                #=============TAFB
+                sum_month_tafb_total = 0
+                sum_month_int_tafb_total = 0
+                #============REGULAR TFP
+                sum_month_tfp = 0
+                #============VACATION/SICK
+                sum_month_vacation_sick = 0
+                #============VJA
+                sum_month_vja = 0
+                #============HOLIDAY
+                sum_month_holiday = 0
+                #============time_half
+                sum_month_time_half = 0
+                #================ DOUBLE TIME LYFE
+                sum_month_double_time = 0
+                #================ DOUBLE & HALF LYFE
+                sum_month_double_half = 0
+                #================ TRIPLE LYFE
+                sum_month_triple = 0
+                #================ OVERRIDES LYFE
+                sum_month_overrides = 0
+                #================ A-POSITION LYFE
+                sum_month_a_hours = 0
+                #============Totals
+                sum_month_total_credits = 0
+                #========Reserve No Fly=======
+                sum_month_reserve_no_fly_hours = 0
+
+                #HERE WILL BE A LINE OF FOR/INS THAT WILL TOTAL EACH CAT FOR THE YEAR
+                for month in all_cascade_patch_month:
+                    # if month.month_guarantee_hours != None:
+                    #     sum_month_guarantee_hours += month.month_guarantee_hours
+                    # if month.month_guarantee_hours_worked_rated != None:
+                    #     sum_month_guarantee_hours_worked_rated += month.month_guarantee_hours_worked_rated
+                    if month.month_tafb_total != None:
+                        sum_month_tafb_total += month.month_tafb_total
+                    if month.month_int_tafb_total != None:
+                        sum_month_int_tafb_total += month.month_int_tafb_total
+                    if month.month_tfp != None:
+                        sum_month_tfp += month.month_tfp
+                    if month.month_vacation_sick != None:
+                        sum_month_vacation_sick += month.month_vacation_sick
+                    if month.month_vja != None:
+                        sum_month_vja += month.month_vja
+                    if month.month_holiday != None:
+                        sum_month_holiday += month.month_holiday
+                    if month.month_time_half != None:
+                        sum_month_time_half += month.month_time_half
+                    if month.month_double_time != None:
+                        sum_month_double_time += month.month_double_time
+                    if month.month_double_half != None:
+                        sum_month_double_half += month.month_double_half
+                    if month.month_triple != None:
+                        sum_month_triple += month.month_triple
+                    if month.month_overrides != None:
+                        sum_month_overrides += month.month_overrides
+                    if month.month_a_hours != None:
+                        sum_month_a_hours += month.month_a_hours
+                    if month.month_total_credits != None:
+                        sum_month_total_credits += month.month_total_credits
+                    if month.month_duty_hours != None:
+                        sum_month_duty_hours += month.month_duty_hours
+                    if month.month_reserve_no_fly_hours != None:
+                        sum_month_reserve_no_fly_hours += month.month_reserve_no_fly_hours
+
+                    #THIS IS THE QUERY FOR THE YEAR WE'RE UPDATING WITH THE MONTHLY TOTALS 
+                    cascade_patch_year = Year.query.filter_by(id=cascade_patch_month.year_id).first()
+                    #THIS WILL BE LINES WHERE WE ASSIGN VALUE TO YEAR CATS WITH MONTHLY TOTALS
+                    #========New additions=======
+                    cascade_patch_year.year_duty_hours = sum_month_duty_hours
+                    #=============TAFB
+                    cascade_patch_year.year_tafb_total = sum_month_tafb_total
+                    cascade_patch_year.year_tafb_pay = tafb_pay(sum_month_tafb_total)
+                    #=============TAFB INT
+                    cascade_patch_year.year_int_tafb = sum_month_int_tafb_total
+                    cascade_patch_year.year_int_tafb_pay = int_tafb_pay(sum_month_int_tafb_total)
+                    #============VACATION/SICK
+                    cascade_patch_year.year_vacation_sick = sum_month_vacation_sick
+                    cascade_patch_year.year_vacation_sick_pay = tfp_pay_function(sum_month_vacation_sick)
+                    #============REGULAR TFP
+                    cascade_patch_year.year_tfp = sum_month_tfp
+                    cascade_patch_year.year_tfp_pay = tfp_pay_function(sum_month_tfp)
+                    #============VJA
+                    cascade_patch_year.year_vja = sum_month_vja
+                    cascade_patch_year.year_vja_rated= one_point_five_rate(sum_month_vja)
+                    cascade_patch_year.year_vja_pay= one_point_five_pay(sum_month_vja)
+                    # #============HOLIDAY
+                    cascade_patch_year.year_holiday = sum_month_holiday
+                    cascade_patch_year.year_holiday_rated= double_rate(sum_month_holiday)
+                    cascade_patch_year.year_holiday_pay= double_pay(sum_month_holiday)
+                    #============TIME_HALF
+                    cascade_patch_year.year_time_half = sum_month_time_half
+                    cascade_patch_year.year_time_half_rated= one_point_five_rate(sum_month_time_half)
+                    cascade_patch_year.year_time_half_pay= one_point_five_pay(sum_month_time_half)
+                    #============DOUBLE_TIME
+                    cascade_patch_year.year_double_time = sum_month_double_time
+                    cascade_patch_year.year_double_time_rated= more_better_function_rate(sum_month_double_time,2)
+                    cascade_patch_year.year_double_time_pay= more_better_function_pay(sum_month_double_time,2)
+                    #============DOUBLE_HALF
+                    cascade_patch_year.year_double_half = sum_month_double_half
+                    cascade_patch_year.year_double_half_rated= more_better_function_rate(sum_month_double_half,2.5)
+                    cascade_patch_year.year_double_half_pay= more_better_function_pay(sum_month_double_half,2.5)
+                    #============TRIPLE
+                    cascade_patch_year.year_triple = sum_month_triple
+                    cascade_patch_year.year_triple_rated= more_better_function_rate(sum_month_triple,3)
+                    cascade_patch_year.year_triple_pay= more_better_function_pay(sum_month_triple,3)
+                    #============OVERRIDES
+                    cascade_patch_year.year_overrides = sum_month_overrides
+                    cascade_patch_year.year_overrides_pay = override_pay(sum_month_overrides)
+                    #============A-POSITON
+                    cascade_patch_year.year_a_hours = sum_month_a_hours
+                    cascade_patch_year.year_a_pay = container_a_position_pay(sum_month_a_hours)
+                    # # #===============Reserve Nofly HOURS 
+                    cascade_patch_year.year_reserve_no_fly_hours = sum_month_reserve_no_fly_hours
+                    cascade_patch_year.year_reserve_no_fly_pay = tfp_pay_function(sum_month_reserve_no_fly_hours)
+                    # cascade_patch_year.year_guarantee_hours = sum_month_guarantee_hours
+                    # cascade_patch_year.year_guarantee_hours_worked_rated = sum_month_guarantee_hours_worked_rated
+                    #============Totals ACTUAL 
+                    cascade_patch_year.year_total_credits = totals(sum_month_reserve_no_fly_hours, sum_month_tfp,sum_month_vacation_sick,sum_month_vja,sum_month_holiday,sum_month_time_half,sum_month_double_time,sum_month_double_half,sum_month_triple)
+                    #============Totals RATED
+                    cascade_patch_year.year_total_credits_rated= totals(sum_month_reserve_no_fly_hours, sum_month_tfp,sum_month_vacation_sick,one_point_five_rate(sum_month_vja),double_rate(sum_month_holiday),one_point_five_rate(sum_month_time_half),more_better_function_rate(sum_month_double_time,2),more_better_function_rate(sum_month_double_half,2.5),more_better_function_rate(sum_month_triple,3))
+                    #============Totals PAY
+                    cascade_patch_year.year_total_pay = totals(tfp_pay_function(sum_month_reserve_no_fly_hours),tfp_pay_function(sum_month_tfp),tfp_pay_function(sum_month_vacation_sick),one_point_five_pay(sum_month_vja),double_pay(sum_month_holiday),one_point_five_pay(sum_month_time_half),more_better_function_pay(sum_month_double_time,2),more_better_function_pay(sum_month_double_half,2.5),more_better_function_pay(sum_month_triple,3), tafb_pay(sum_month_tafb_total),int_tafb_pay(sum_month_int_tafb_total),override_pay(sum_month_overrides),container_a_position_pay(sum_month_a_hours))
+                    # #=====================
+                    db.session.add(cascade_patch_year)
+                    db.session.commit()
+
             except Exception as e:
                 message = {'errors': [e.__str__()]}
                 return make_response(message, 422)
@@ -794,8 +1064,269 @@ class PairingsById(Resource):
             }
             return make_response(response_dict, 404)
         else:
+            id_to_use = response_obj.month_id
             db.session.delete(response_obj)
             db.session.commit()
+
+            all_cascade_patch_pairing =Pairing.query.filter_by(month_id=id_to_use)
+            #===============Reserve Stuff 
+            sum_pairing_guarantee_hours = 0
+            sum_pairing_guarantee_hours_worked_rated = 0
+            #=============TAFB
+            sum_tafb_total = 0
+            sum_int_tafb_total = 0
+            #============REGULAR TFP
+            sum_pairing_tfp = 0
+            #============VACATION/SICK
+            sum_pairing_vacation_sick = 0
+            #============VJA
+            sum_pairing_vja = 0
+            #============HOLIDAY
+            sum_pairing_holiday = 0
+            #============time_half
+            sum_pairing_time_half = 0
+            #================ DOUBLE TIME LYFE
+            sum_pairing_double_time = 0
+            #================ DOUBLE & HALF LYFE
+            sum_pairing_double_half = 0
+            #================ TRIPLE LYFE
+            sum_pairing_triple = 0
+            #================ OVERRIDES LYFE
+            sum_pairing_overrides = 0
+            #================ A-POSITION LYFE
+            sum_pairing_a_hours = 0
+            #============Totals
+            sum_pairing_total_credits = 0
+            #========New additions=======
+            sum_pairing_duty_hours = 0
+            sum_pairing_reserve_no_fly_hours =0
+
+            for pairing in all_cascade_patch_pairing:
+                if pairing.pairing_guarantee_hours != None:
+                    sum_pairing_guarantee_hours += pairing.pairing_guarantee_hours
+                if pairing.pairing_guarantee_hours_worked_rated != None:
+                    sum_pairing_guarantee_hours_worked_rated += pairing.pairing_guarantee_hours_worked_rated
+                if pairing.tafb_total != None:
+                    sum_tafb_total += pairing.tafb_total
+                if pairing.int_tafb_total != None:
+                    sum_int_tafb_total += pairing.int_tafb_total
+                if pairing.pairing_tfp != None:
+                    sum_pairing_tfp += pairing.pairing_tfp
+                if pairing.pairing_vacation_sick != None:
+                    sum_pairing_vacation_sick += pairing.pairing_vacation_sick
+                if pairing.pairing_vja != None:
+                    sum_pairing_vja += pairing.pairing_vja
+                if pairing.pairing_holiday != None:
+                    sum_pairing_holiday += pairing.pairing_holiday
+                if pairing.pairing_time_half != None:
+                    sum_pairing_time_half += pairing.pairing_time_half
+                if pairing.pairing_double_time != None:
+                    sum_pairing_double_time += pairing.pairing_double_time
+                if pairing.pairing_double_half != None:
+                    sum_pairing_double_half += pairing.pairing_double_half
+                if pairing.pairing_triple != None:
+                    sum_pairing_triple += pairing.pairing_triple
+                if pairing.pairing_overrides != None:
+                    sum_pairing_overrides += pairing.pairing_overrides
+                if pairing.pairing_a_hours != None:
+                    sum_pairing_a_hours += pairing.pairing_a_hours
+                if pairing.pairing_total_credits != None:
+                    sum_pairing_total_credits += pairing.pairing_total_credits
+                if pairing.pairing_duty_hours != None:
+                    sum_pairing_duty_hours += pairing.pairing_duty_hours
+                if pairing.pairing_reserve_no_fly_hours != None:
+                    sum_pairing_reserve_no_fly_hours += pairing.pairing_reserve_no_fly_hours
+
+            cascade_patch_month = Month.query.filter_by(id=id_to_use).first()
+            #========New additions=======
+            cascade_patch_month.month_duty_hours = sum_pairing_duty_hours
+            #=============TAFB
+            cascade_patch_month.month_tafb_total = sum_tafb_total
+            cascade_patch_month.month_tafb_pay = tafb_pay(sum_tafb_total)
+            #=============TAFB INT
+            cascade_patch_month.month_int_tafb_total = sum_int_tafb_total
+            cascade_patch_month.month_int_tafb_pay = int_tafb_pay(sum_int_tafb_total)
+            #============VACATION/SICK
+            cascade_patch_month.month_vacation_sick = sum_pairing_vacation_sick
+            cascade_patch_month.month_vacation_sick_pay = tfp_pay_function(sum_pairing_vacation_sick)
+            #============REGULAR TFP
+            cascade_patch_month.month_tfp = sum_pairing_tfp
+            cascade_patch_month.month_tfp_pay = tfp_pay_function(sum_pairing_tfp)
+            #============VJA
+            cascade_patch_month.month_vja = sum_pairing_vja
+            cascade_patch_month.month_vja_rated= one_point_five_rate(sum_pairing_vja)
+            cascade_patch_month.month_vja_pay= one_point_five_pay(sum_pairing_vja)
+            # #============HOLIDAY
+            cascade_patch_month.month_holiday = sum_pairing_holiday
+            cascade_patch_month.month_holiday_rated= double_rate(sum_pairing_holiday)
+            cascade_patch_month.month_holiday_pay= double_pay(sum_pairing_holiday)
+            #============TIME_HALF
+            cascade_patch_month.month_time_half = sum_pairing_time_half
+            cascade_patch_month.month_time_half_rated= one_point_five_rate(sum_pairing_time_half)
+            cascade_patch_month.month_time_half_pay= one_point_five_pay(sum_pairing_time_half)
+            #============DOUBLE_TIME
+            cascade_patch_month.month_double_time = sum_pairing_double_time
+            cascade_patch_month.month_double_time_rated= more_better_function_rate(sum_pairing_double_time,2)
+            cascade_patch_month.month_double_time_pay= more_better_function_pay(sum_pairing_double_time,2)
+            #============DOUBLE_HALF
+            cascade_patch_month.month_double_half = sum_pairing_double_half
+            cascade_patch_month.month_double_half_rated= more_better_function_rate(sum_pairing_double_half,2.5)
+            cascade_patch_month.month_double_half_pay= more_better_function_pay(sum_pairing_double_half,2.5)
+            #============TRIPLE
+            cascade_patch_month.month_triple = sum_pairing_triple
+            cascade_patch_month.month_triple_rated= more_better_function_rate(sum_pairing_triple,3)
+            cascade_patch_month.month_triple_pay= more_better_function_pay(sum_pairing_triple,3)
+            #============OVERRIDES
+            cascade_patch_month.month_overrides = sum_pairing_overrides
+            cascade_patch_month.month_overrides_pay = override_pay(sum_pairing_overrides)
+            #============A-POSITON
+            cascade_patch_month.month_a_hours = sum_pairing_a_hours
+            cascade_patch_month.month_a_pay = container_a_position_pay(sum_pairing_a_hours)
+            # #===============Reserve NO FLY HOURS 
+            cascade_patch_month.month_reserve_no_fly_hours = sum_pairing_reserve_no_fly_hours
+            cascade_patch_month.month_reserve_no_fly_pay = tfp_pay_function(sum_pairing_reserve_no_fly_hours)
+            # #===============Reserve GUARANTEE HOURS 
+            cascade_patch_month.month_guarantee_hours = sum_pairing_guarantee_hours
+            cascade_patch_month.month_guarantee_hours_worked_rated = sum_pairing_guarantee_hours_worked_rated
+            #============Totals ACTUAL 
+            cascade_patch_month.month_total_credits = totals(sum_pairing_reserve_no_fly_hours,sum_pairing_tfp,sum_pairing_vacation_sick,sum_pairing_vja,sum_pairing_holiday,sum_pairing_time_half,sum_pairing_double_time,sum_pairing_double_half,sum_pairing_triple)
+            #============Totals RATED
+            cascade_patch_month.month_total_credits_rated= totals(sum_pairing_reserve_no_fly_hours,sum_pairing_tfp,sum_pairing_vacation_sick,one_point_five_rate(sum_pairing_vja),double_rate(sum_pairing_holiday),one_point_five_rate(sum_pairing_time_half),more_better_function_rate(sum_pairing_double_time,2),more_better_function_rate(sum_pairing_double_half,2.5),more_better_function_rate(sum_pairing_triple,3))
+            #============Totals PAY
+            cascade_patch_month.month_total_pay = totals(tfp_pay_function(sum_pairing_reserve_no_fly_hours),tfp_pay_function(sum_pairing_tfp),tfp_pay_function(sum_pairing_vacation_sick),one_point_five_pay(sum_pairing_vja),double_pay(sum_pairing_holiday),one_point_five_pay(sum_pairing_time_half),more_better_function_pay(sum_pairing_double_time,2),more_better_function_pay(sum_pairing_double_half,2.5),more_better_function_pay(sum_pairing_triple,3), tafb_pay(sum_tafb_total),int_tafb_pay(sum_int_tafb_total),override_pay(sum_pairing_overrides),container_a_position_pay(sum_pairing_a_hours))
+            # #=====================
+            db.session.add(cascade_patch_month)
+            db.session.commit()
+            # THIS IS THE QUERY FOR ALL RELATED MONTHS
+            all_cascade_patch_month = Month.query.filter_by(year_id=cascade_patch_month.year_id)
+            #========New additions=======
+            sum_month_duty_hours = 0
+            #=============TAFB
+            sum_month_tafb_total = 0
+            sum_month_int_tafb_total = 0
+            #============REGULAR TFP
+            sum_month_tfp = 0
+            #============VACATION/SICK
+            sum_month_vacation_sick = 0
+            #============VJA
+            sum_month_vja = 0
+            #============HOLIDAY
+            sum_month_holiday = 0
+            #============time_half
+            sum_month_time_half = 0
+            #================ DOUBLE TIME LYFE
+            sum_month_double_time = 0
+            #================ DOUBLE & HALF LYFE
+            sum_month_double_half = 0
+            #================ TRIPLE LYFE
+            sum_month_triple = 0
+            #================ OVERRIDES LYFE
+            sum_month_overrides = 0
+            #================ A-POSITION LYFE
+            sum_month_a_hours = 0
+            #============Totals
+            sum_month_total_credits = 0
+            #========Reserve No Fly=======
+            sum_month_reserve_no_fly_hours = 0
+
+            #HERE WILL BE A LINE OF FOR/INS THAT WILL TOTAL EACH CAT FOR THE YEAR
+            for month in all_cascade_patch_month:
+                # if month.month_guarantee_hours != None:
+                #     sum_month_guarantee_hours += month.month_guarantee_hours
+                # if month.month_guarantee_hours_worked_rated != None:
+                #     sum_month_guarantee_hours_worked_rated += month.month_guarantee_hours_worked_rated
+                if month.month_tafb_total != None:
+                    sum_month_tafb_total += month.month_tafb_total
+                if month.month_int_tafb_total != None:
+                    sum_month_int_tafb_total += month.month_int_tafb_total
+                if month.month_tfp != None:
+                    sum_month_tfp += month.month_tfp
+                if month.month_vacation_sick != None:
+                    sum_month_vacation_sick += month.month_vacation_sick
+                if month.month_vja != None:
+                    sum_month_vja += month.month_vja
+                if month.month_holiday != None:
+                    sum_month_holiday += month.month_holiday
+                if month.month_time_half != None:
+                    sum_month_time_half += month.month_time_half
+                if month.month_double_time != None:
+                    sum_month_double_time += month.month_double_time
+                if month.month_double_half != None:
+                    sum_month_double_half += month.month_double_half
+                if month.month_triple != None:
+                    sum_month_triple += month.month_triple
+                if month.month_overrides != None:
+                    sum_month_overrides += month.month_overrides
+                if month.month_a_hours != None:
+                    sum_month_a_hours += month.month_a_hours
+                if month.month_total_credits != None:
+                    sum_month_total_credits += month.month_total_credits
+                if month.month_duty_hours != None:
+                    sum_month_duty_hours += month.month_duty_hours
+                if month.month_reserve_no_fly_hours != None:
+                    sum_month_reserve_no_fly_hours += month.month_reserve_no_fly_hours
+
+                #THIS IS THE QUERY FOR THE YEAR WE'RE UPDATING WITH THE MONTHLY TOTALS 
+                cascade_patch_year = Year.query.filter_by(id=cascade_patch_month.year_id).first()
+                #THIS WILL BE LINES WHERE WE ASSIGN VALUE TO YEAR CATS WITH MONTHLY TOTALS
+                #========New additions=======
+                cascade_patch_year.year_duty_hours = sum_month_duty_hours
+                #=============TAFB
+                cascade_patch_year.year_tafb_total = sum_month_tafb_total
+                cascade_patch_year.year_tafb_pay = tafb_pay(sum_month_tafb_total)
+                #=============TAFB INT
+                cascade_patch_year.year_int_tafb = sum_month_int_tafb_total
+                cascade_patch_year.year_int_tafb_pay = int_tafb_pay(sum_month_int_tafb_total)
+                #============VACATION/SICK
+                cascade_patch_year.year_vacation_sick = sum_month_vacation_sick
+                cascade_patch_year.year_vacation_sick_pay = tfp_pay_function(sum_month_vacation_sick)
+                #============REGULAR TFP
+                cascade_patch_year.year_tfp = sum_month_tfp
+                cascade_patch_year.year_tfp_pay = tfp_pay_function(sum_month_tfp)
+                #============VJA
+                cascade_patch_year.year_vja = sum_month_vja
+                cascade_patch_year.year_vja_rated= one_point_five_rate(sum_month_vja)
+                cascade_patch_year.year_vja_pay= one_point_five_pay(sum_month_vja)
+                # #============HOLIDAY
+                cascade_patch_year.year_holiday = sum_month_holiday
+                cascade_patch_year.year_holiday_rated= double_rate(sum_month_holiday)
+                cascade_patch_year.year_holiday_pay= double_pay(sum_month_holiday)
+                #============TIME_HALF
+                cascade_patch_year.year_time_half = sum_month_time_half
+                cascade_patch_year.year_time_half_rated= one_point_five_rate(sum_month_time_half)
+                cascade_patch_year.year_time_half_pay= one_point_five_pay(sum_month_time_half)
+                #============DOUBLE_TIME
+                cascade_patch_year.year_double_time = sum_month_double_time
+                cascade_patch_year.year_double_time_rated= more_better_function_rate(sum_month_double_time,2)
+                cascade_patch_year.year_double_time_pay= more_better_function_pay(sum_month_double_time,2)
+                #============DOUBLE_HALF
+                cascade_patch_year.year_double_half = sum_month_double_half
+                cascade_patch_year.year_double_half_rated= more_better_function_rate(sum_month_double_half,2.5)
+                cascade_patch_year.year_double_half_pay= more_better_function_pay(sum_month_double_half,2.5)
+                #============TRIPLE
+                cascade_patch_year.year_triple = sum_month_triple
+                cascade_patch_year.year_triple_rated= more_better_function_rate(sum_month_triple,3)
+                cascade_patch_year.year_triple_pay= more_better_function_pay(sum_month_triple,3)
+                #============OVERRIDES
+                cascade_patch_year.year_overrides = sum_month_overrides
+                cascade_patch_year.year_overrides_pay = override_pay(sum_month_overrides)
+                #============A-POSITON
+                cascade_patch_year.year_a_hours = sum_month_a_hours
+                cascade_patch_year.year_a_pay = container_a_position_pay(sum_month_a_hours)
+                # # #===============Reserve Nofly HOURS 
+                cascade_patch_year.year_reserve_no_fly_hours = sum_month_reserve_no_fly_hours
+                cascade_patch_year.year_reserve_no_fly_pay = tfp_pay_function(sum_month_reserve_no_fly_hours)
+                # cascade_patch_year.year_guarantee_hours = sum_month_guarantee_hours
+                # cascade_patch_year.year_guarantee_hours_worked_rated = sum_month_guarantee_hours_worked_rated
+                #============Totals ACTUAL 
+                cascade_patch_year.year_total_credits = totals(sum_month_reserve_no_fly_hours, sum_month_tfp,sum_month_vacation_sick,sum_month_vja,sum_month_holiday,sum_month_time_half,sum_month_double_time,sum_month_double_half,sum_month_triple)
+                #============Totals RATED
+                cascade_patch_year.year_total_credits_rated= totals(sum_month_reserve_no_fly_hours, sum_month_tfp,sum_month_vacation_sick,one_point_five_rate(sum_month_vja),double_rate(sum_month_holiday),one_point_five_rate(sum_month_time_half),more_better_function_rate(sum_month_double_time,2),more_better_function_rate(sum_month_double_half,2.5),more_better_function_rate(sum_month_triple,3))
+                #============Totals PAY
+                cascade_patch_year.year_total_pay = totals(tfp_pay_function(sum_month_reserve_no_fly_hours),tfp_pay_function(sum_month_tfp),tfp_pay_function(sum_month_vacation_sick),one_point_five_pay(sum_month_vja),double_pay(sum_month_holiday),one_point_five_pay(sum_month_time_half),more_better_function_pay(sum_month_double_time,2),more_better_function_pay(sum_month_double_half,2.5),more_better_function_pay(sum_month_triple,3), tafb_pay(sum_month_tafb_total),int_tafb_pay(sum_month_int_tafb_total),override_pay(sum_month_overrides),container_a_position_pay(sum_month_a_hours))
+                # #=====================
+                db.session.add(cascade_patch_year)
+                db.session.commit()
             response_dict = {"message": "deleted fo sho!"}
             return response_dict, 200
 api.add_resource(PairingsById, '/pairings/<int:id>')
@@ -1428,7 +1959,7 @@ class CascadeTest(Resource):
                     #New shit ============
                     cascade_patch_pairing.pairing_duty_hours = sum_daily_duty_hours
                     #=============TAFB
-                    print(cascade_patch_pairing.tafb_total, ' the fuck is going on')
+                    # print(cascade_patch_pairing.tafb_total, ' the fuck is going on')
                     if cascade_patch_pairing.tafb_total:
                         cascade_patch_pairing.tafb_pay = tafb_pay(cascade_patch_pairing.tafb_total)
                     #=============TAFB INT
@@ -1622,7 +2153,7 @@ class CascadeTest(Resource):
                     #============Totals RATED
                     cascade_patch_month.month_total_credits_rated= totals(sum_pairing_reserve_no_fly_hours,sum_pairing_tfp,sum_pairing_vacation_sick,one_point_five_rate(sum_pairing_vja),double_rate(sum_pairing_holiday),one_point_five_rate(sum_pairing_time_half),more_better_function_rate(sum_pairing_double_time,2),more_better_function_rate(sum_pairing_double_half,2.5),more_better_function_rate(sum_pairing_triple,3))
                     #============Totals PAY
-                    cascade_patch_month.month_total_pay = totals(tfp_pay_function(sum_pairing_reserve_no_fly_hours),tfp_pay_function(sum_pairing_tfp),tfp_pay_function(sum_pairing_vacation_sick),one_point_five_pay(sum_pairing_vja),double_pay(sum_pairing_holiday),one_point_five_pay(sum_pairing_time_half),more_better_function_pay(sum_pairing_double_time,2),more_better_function_pay(sum_pairing_double_half,2.5),more_better_function_pay(sum_pairing_triple,3), tafb_pay(cascade_patch_pairing.tafb_total),int_tafb_pay(cascade_patch_pairing.int_tafb_total),override_pay(sum_pairing_overrides),container_a_position_pay(sum_pairing_a_hours))
+                    cascade_patch_month.month_total_pay = totals(tfp_pay_function(sum_pairing_reserve_no_fly_hours),tfp_pay_function(sum_pairing_tfp),tfp_pay_function(sum_pairing_vacation_sick),one_point_five_pay(sum_pairing_vja),double_pay(sum_pairing_holiday),one_point_five_pay(sum_pairing_time_half),more_better_function_pay(sum_pairing_double_time,2),more_better_function_pay(sum_pairing_double_half,2.5),more_better_function_pay(sum_pairing_triple,3), tafb_pay(sum_tafb_total),int_tafb_pay(sum_int_tafb_total),override_pay(sum_pairing_overrides),container_a_position_pay(sum_pairing_a_hours))
                     # #=====================
                     db.session.add(cascade_patch_month)
                     db.session.commit()
@@ -1756,12 +2287,413 @@ class CascadeTest(Resource):
                         # #=====================
                         db.session.add(cascade_patch_year)
                         db.session.commit()
-
-
             except Exception as e:
                 message = {'errors': [e.__str__()]}
                 return make_response(message, 422)
             return make_response(response_obj.to_dict(), 200)
+    def delete(self,id):
+        response_obj = Day.query.filter_by(id=id).first()
+        if response_obj == None: 
+            response_dict = {
+                "error": "Day not found"
+            }
+            return make_response(response_dict, 404)
+        else:
+            id_to_use = response_obj.pairing_id
+            db.session.delete(response_obj)
+            db.session.commit()
+            all_days = Day.query.filter_by(pairing_id=id_to_use)
+            #============REGULAR TFP
+            sum_total_tfp = 0
+            #============VACATION/SICK
+            sum_vacation_sick = 0
+            #============VJA
+            sum_vja = 0
+            #============HOLIDAY
+            sum_holiday = 0
+            #============time_half
+            sum_time_half = 0
+            #================ DOUBLE TIME LYFE
+            sum_double_time = 0
+            #================ DOUBLE & HALF LYFE
+            sum_double_half = 0
+            #================ TRIPLE LYFE
+            sum_triple = 0
+            #================ OVERRIDES LYFE
+            sum_overrides = 0
+            #================ A-POSITION LYFE
+            sum_a_hours = 0
+            #============Totals
+            sum_total_credits = 0
+            #========New additions=======
+            sum_daily_duty_hours = 0
+            sum_reserve_no_fly_hours = 0 
+
+
+            for days in all_days:
+                if days.total_tfp != None:
+                    sum_total_tfp += days.total_tfp
+                if days.vacation_sick != None:
+                    sum_vacation_sick += days.vacation_sick
+                if days.vja != None:
+                    sum_vja += days.vja
+                if days.holiday != None:
+                    sum_holiday += days.holiday
+                if days.time_half != None:
+                    sum_time_half += days.time_half
+                if days.double_time != None:
+                    sum_double_time += days.double_time
+                if days.double_half != None:
+                    sum_double_half += days.double_half
+                if days.triple != None:
+                    sum_triple += days.triple
+                if days.overrides != None:
+                    sum_overrides += days.overrides
+                if days.a_hours != None:
+                    sum_a_hours += days.a_hours
+                if days.total_credits != None:
+                    sum_total_credits += days.total_credits
+                if days.daily_duty_hours != None:
+                    sum_daily_duty_hours += days.daily_duty_hours
+                if days.reserve_no_fly_hours != None:
+                    sum_reserve_no_fly_hours += days.reserve_no_fly_hours
+                
+                cascade_patch_pairing = Pairing.query.filter_by(id=id_to_use).first()
+                
+                #New shit ============
+                cascade_patch_pairing.pairing_duty_hours = sum_daily_duty_hours
+                #=============TAFB
+                # print(cascade_patch_pairing.tafb_total, ' the fuck is going on')
+                if cascade_patch_pairing.tafb_total:
+                    cascade_patch_pairing.tafb_pay = tafb_pay(cascade_patch_pairing.tafb_total)
+                #=============TAFB INT
+                if cascade_patch_pairing.int_tafb_total:
+                    cascade_patch_pairing.int_tafb_pay = int_tafb_pay(cascade_patch_pairing.int_tafb_total)
+                #============VACATION/SICK
+                cascade_patch_pairing.pairing_vacation_sick = sum_vacation_sick
+                cascade_patch_pairing.pairing_vacation_sick_pay = tfp_pay_function(sum_vacation_sick)
+                #============REGULAR TFP
+                cascade_patch_pairing.pairing_tfp = sum_total_tfp
+                cascade_patch_pairing.pairing_tfp_pay = tfp_pay_function(sum_total_tfp)
+                #============VJA
+                cascade_patch_pairing.pairing_vja = sum_vja
+                cascade_patch_pairing.pairing_vja_rated= one_point_five_rate(sum_vja)
+                cascade_patch_pairing.pairing_vja_pay= one_point_five_pay(sum_vja)
+                # #============HOLIDAY
+                cascade_patch_pairing.pairing_holiday = sum_holiday
+                cascade_patch_pairing.pairing_holiday_rated= double_rate(sum_holiday)
+                cascade_patch_pairing.pairing_holiday_pay= double_pay(sum_holiday)
+                #============TIME_HALF
+                cascade_patch_pairing.pairing_time_half = sum_time_half
+                cascade_patch_pairing.pairing_time_half_rated= one_point_five_rate(sum_time_half)
+                cascade_patch_pairing.pairing_time_half_pay= one_point_five_pay(sum_time_half)
+                #============DOUBLE_TIME
+                cascade_patch_pairing.pairing_double_time = sum_double_time
+                cascade_patch_pairing.pairing_double_time_rated= more_better_function_rate(sum_double_time,2)
+                cascade_patch_pairing.pairing_double_time_pay= more_better_function_pay(sum_double_time,2)
+                #============DOUBLE_HALF
+                cascade_patch_pairing.pairing_double_half = sum_double_half
+                cascade_patch_pairing.pairing_double_half_rated= more_better_function_rate(sum_double_half,2.5)
+                cascade_patch_pairing.pairing_double_half_pay= more_better_function_pay(sum_double_half,2.5)
+                #============TRIPLE
+                cascade_patch_pairing.pairing_triple = sum_triple
+                cascade_patch_pairing.pairing_triple_rated= more_better_function_rate(sum_triple,3)
+                cascade_patch_pairing.pairing_triple_pay= more_better_function_pay(sum_triple,3)
+                #============OVERRIDES
+                cascade_patch_pairing.pairing_overrides = sum_overrides
+                cascade_patch_pairing.pairing_overrides_pay = override_pay(sum_overrides)
+                #============A-POSITON
+                cascade_patch_pairing.pairing_a_hours = sum_a_hours
+                cascade_patch_pairing.pairing_a_pay = container_a_position_pay(sum_a_hours)
+                # #===============Reserve Stuff 
+                cascade_patch_pairing.reserve_block = cascade_patch_pairing.reserve_block
+                # #===============Reserve GUARANTEE HOURS 
+                if cascade_patch_pairing.reserve_block:
+                    day_count = Day.query.filter_by(pairing_id=cascade_patch_pairing.id).count()
+                    if cascade_patch_pairing.reserve_block:
+                        cascade_patch_pairing.pairing_guarantee_hours = 6 * day_count
+                    else:
+                        cascade_patch_pairing.pairing_guarantee_hours = 0
+                # #===============Reserve NO FLY HOURS 
+                cascade_patch_pairing.pairing_reserve_no_fly_hours = sum_reserve_no_fly_hours
+                cascade_patch_pairing.pairing_reserve_no_fly_pay = tfp_pay_function(sum_reserve_no_fly_hours)
+
+                #===============Reserve  WORKED TOWARDS GUARANTEE  
+                cascade_patch_pairing.pairing_guarantee_hours_worked_rated = totals(sum_total_tfp,sum_reserve_no_fly_hours, sum_vacation_sick,one_point_five_rate(sum_vja),double_rate(sum_holiday),one_point_five_rate(sum_time_half),more_better_function_rate(sum_double_time,2),more_better_function_rate(sum_double_half,2.5),more_better_function_rate(sum_triple,3)) if cascade_patch_pairing.reserve_block else 0
+                #============Totals ACTUAL 
+                cascade_patch_pairing.pairing_total_credits = totals(sum_total_tfp,sum_reserve_no_fly_hours, sum_vacation_sick,sum_vja,sum_holiday,sum_time_half,sum_double_time,sum_double_half,sum_triple)
+                #============Totals RATED
+                cascade_patch_pairing.pairing_total_credits_rated= totals(sum_reserve_no_fly_hours,sum_total_tfp,sum_vacation_sick,one_point_five_rate(sum_vja),double_rate(sum_holiday),one_point_five_rate(sum_time_half),more_better_function_rate(sum_double_time,2),more_better_function_rate(sum_double_half,2.5),more_better_function_rate(sum_triple,3))
+                #============Totals PAY
+                cascade_patch_pairing.pairing_total_pay = totals(tfp_pay_function(sum_total_tfp),tfp_pay_function(sum_vacation_sick),one_point_five_pay(sum_vja),double_pay(sum_holiday),one_point_five_pay(sum_time_half),more_better_function_pay(sum_double_time,2),more_better_function_pay(sum_double_half,2.5),more_better_function_pay(sum_triple,3), tafb_pay(cascade_patch_pairing.tafb_total),int_tafb_pay(cascade_patch_pairing.int_tafb_total),override_pay(sum_overrides),container_a_position_pay(sum_a_hours), tfp_pay_function(sum_reserve_no_fly_hours))
+                # #=====================
+
+
+                db.session.add(cascade_patch_pairing)
+                db.session.commit()
+
+                all_cascade_patch_pairing =Pairing.query.filter_by(month_id=cascade_patch_pairing.month_id)
+                    #===============Reserve Stuff 
+                sum_pairing_guarantee_hours = 0
+                sum_pairing_guarantee_hours_worked_rated = 0
+                #=============TAFB
+                sum_tafb_total = 0
+                sum_int_tafb_total = 0
+                #============REGULAR TFP
+                sum_pairing_tfp = 0
+                #============VACATION/SICK
+                sum_pairing_vacation_sick = 0
+                #============VJA
+                sum_pairing_vja = 0
+                #============HOLIDAY
+                sum_pairing_holiday = 0
+                #============time_half
+                sum_pairing_time_half = 0
+                #================ DOUBLE TIME LYFE
+                sum_pairing_double_time = 0
+                #================ DOUBLE & HALF LYFE
+                sum_pairing_double_half = 0
+                #================ TRIPLE LYFE
+                sum_pairing_triple = 0
+                #================ OVERRIDES LYFE
+                sum_pairing_overrides = 0
+                #================ A-POSITION LYFE
+                sum_pairing_a_hours = 0
+                #============Totals
+                sum_pairing_total_credits = 0
+                #========New additions=======
+                sum_pairing_duty_hours = 0
+                sum_pairing_reserve_no_fly_hours =0
+
+                for pairing in all_cascade_patch_pairing:
+                    if pairing.pairing_guarantee_hours != None:
+                        sum_pairing_guarantee_hours += pairing.pairing_guarantee_hours
+                    if pairing.pairing_guarantee_hours_worked_rated != None:
+                        sum_pairing_guarantee_hours_worked_rated += pairing.pairing_guarantee_hours_worked_rated
+                    if pairing.tafb_total != None:
+                        sum_tafb_total += pairing.tafb_total
+                    if pairing.int_tafb_total != None:
+                        sum_int_tafb_total += pairing.int_tafb_total
+                    if pairing.pairing_tfp != None:
+                        sum_pairing_tfp += pairing.pairing_tfp
+                    if pairing.pairing_vacation_sick != None:
+                        sum_pairing_vacation_sick += pairing.pairing_vacation_sick
+                    if pairing.pairing_vja != None:
+                        sum_pairing_vja += pairing.pairing_vja
+                    if pairing.pairing_holiday != None:
+                        sum_pairing_holiday += pairing.pairing_holiday
+                    if pairing.pairing_time_half != None:
+                        sum_pairing_time_half += pairing.pairing_time_half
+                    if pairing.pairing_double_time != None:
+                        sum_pairing_double_time += pairing.pairing_double_time
+                    if pairing.pairing_double_half != None:
+                        sum_pairing_double_half += pairing.pairing_double_half
+                    if pairing.pairing_triple != None:
+                        sum_pairing_triple += pairing.pairing_triple
+                    if pairing.pairing_overrides != None:
+                        sum_pairing_overrides += pairing.pairing_overrides
+                    if pairing.pairing_a_hours != None:
+                        sum_pairing_a_hours += pairing.pairing_a_hours
+                    if pairing.pairing_total_credits != None:
+                        sum_pairing_total_credits += pairing.pairing_total_credits
+                    if pairing.pairing_duty_hours != None:
+                        sum_pairing_duty_hours += pairing.pairing_duty_hours
+                    if pairing.pairing_reserve_no_fly_hours != None:
+                        sum_pairing_reserve_no_fly_hours += pairing.pairing_reserve_no_fly_hours
+
+                cascade_patch_month = Month.query.filter_by(id=cascade_patch_pairing.month_id).first()
+                #========New additions=======
+                cascade_patch_month.month_duty_hours = sum_pairing_duty_hours
+                #=============TAFB
+                cascade_patch_month.month_tafb_total = sum_tafb_total
+                cascade_patch_month.month_tafb_pay = tafb_pay(sum_tafb_total)
+                #=============TAFB INT
+                cascade_patch_month.month_int_tafb_total = sum_int_tafb_total
+                cascade_patch_month.month_int_tafb_pay = int_tafb_pay(sum_int_tafb_total)
+                #============VACATION/SICK
+                cascade_patch_month.month_vacation_sick = sum_pairing_vacation_sick
+                cascade_patch_month.month_vacation_sick_pay = tfp_pay_function(sum_pairing_vacation_sick)
+                #============REGULAR TFP
+                cascade_patch_month.month_tfp = sum_pairing_tfp
+                cascade_patch_month.month_tfp_pay = tfp_pay_function(sum_pairing_tfp)
+                #============VJA
+                cascade_patch_month.month_vja = sum_pairing_vja
+                cascade_patch_month.month_vja_rated= one_point_five_rate(sum_pairing_vja)
+                cascade_patch_month.month_vja_pay= one_point_five_pay(sum_pairing_vja)
+                # #============HOLIDAY
+                cascade_patch_month.month_holiday = sum_pairing_holiday
+                cascade_patch_month.month_holiday_rated= double_rate(sum_pairing_holiday)
+                cascade_patch_month.month_holiday_pay= double_pay(sum_pairing_holiday)
+                #============TIME_HALF
+                cascade_patch_month.month_time_half = sum_pairing_time_half
+                cascade_patch_month.month_time_half_rated= one_point_five_rate(sum_pairing_time_half)
+                cascade_patch_month.month_time_half_pay= one_point_five_pay(sum_pairing_time_half)
+                #============DOUBLE_TIME
+                cascade_patch_month.month_double_time = sum_pairing_double_time
+                cascade_patch_month.month_double_time_rated= more_better_function_rate(sum_pairing_double_time,2)
+                cascade_patch_month.month_double_time_pay= more_better_function_pay(sum_pairing_double_time,2)
+                #============DOUBLE_HALF
+                cascade_patch_month.month_double_half = sum_pairing_double_half
+                cascade_patch_month.month_double_half_rated= more_better_function_rate(sum_pairing_double_half,2.5)
+                cascade_patch_month.month_double_half_pay= more_better_function_pay(sum_pairing_double_half,2.5)
+                #============TRIPLE
+                cascade_patch_month.month_triple = sum_pairing_triple
+                cascade_patch_month.month_triple_rated= more_better_function_rate(sum_pairing_triple,3)
+                cascade_patch_month.month_triple_pay= more_better_function_pay(sum_pairing_triple,3)
+                #============OVERRIDES
+                cascade_patch_month.month_overrides = sum_pairing_overrides
+                cascade_patch_month.month_overrides_pay = override_pay(sum_pairing_overrides)
+                #============A-POSITON
+                cascade_patch_month.month_a_hours = sum_pairing_a_hours
+                cascade_patch_month.month_a_pay = container_a_position_pay(sum_pairing_a_hours)
+                # #===============Reserve NO FLY HOURS 
+                cascade_patch_month.month_reserve_no_fly_hours = sum_pairing_reserve_no_fly_hours
+                cascade_patch_month.month_reserve_no_fly_pay = tfp_pay_function(sum_pairing_reserve_no_fly_hours)
+                # #===============Reserve GUARANTEE HOURS 
+                cascade_patch_month.month_guarantee_hours = sum_pairing_guarantee_hours
+                cascade_patch_month.month_guarantee_hours_worked_rated = sum_pairing_guarantee_hours_worked_rated
+                #============Totals ACTUAL 
+                cascade_patch_month.month_total_credits = totals(sum_pairing_reserve_no_fly_hours,sum_pairing_tfp,sum_pairing_vacation_sick,sum_pairing_vja,sum_pairing_holiday,sum_pairing_time_half,sum_pairing_double_time,sum_pairing_double_half,sum_pairing_triple)
+                #============Totals RATED
+                cascade_patch_month.month_total_credits_rated= totals(sum_pairing_reserve_no_fly_hours,sum_pairing_tfp,sum_pairing_vacation_sick,one_point_five_rate(sum_pairing_vja),double_rate(sum_pairing_holiday),one_point_five_rate(sum_pairing_time_half),more_better_function_rate(sum_pairing_double_time,2),more_better_function_rate(sum_pairing_double_half,2.5),more_better_function_rate(sum_pairing_triple,3))
+                #============Totals PAY
+                cascade_patch_month.month_total_pay = totals(tfp_pay_function(sum_pairing_reserve_no_fly_hours),tfp_pay_function(sum_pairing_tfp),tfp_pay_function(sum_pairing_vacation_sick),one_point_five_pay(sum_pairing_vja),double_pay(sum_pairing_holiday),one_point_five_pay(sum_pairing_time_half),more_better_function_pay(sum_pairing_double_time,2),more_better_function_pay(sum_pairing_double_half,2.5),more_better_function_pay(sum_pairing_triple,3), tafb_pay(cascade_patch_pairing.tafb_total),int_tafb_pay(cascade_patch_pairing.int_tafb_total),override_pay(sum_pairing_overrides),container_a_position_pay(sum_pairing_a_hours))
+                # #=====================
+                db.session.add(cascade_patch_month)
+                db.session.commit()
+                # THIS IS THE QUERY FOR ALL RELATED MONTHS
+                all_cascade_patch_month = Month.query.filter_by(year_id=cascade_patch_month.year_id)
+                #========New additions=======
+                sum_month_duty_hours = 0
+                #=============TAFB
+                sum_month_tafb_total = 0
+                sum_month_int_tafb_total = 0
+                #============REGULAR TFP
+                sum_month_tfp = 0
+                #============VACATION/SICK
+                sum_month_vacation_sick = 0
+                #============VJA
+                sum_month_vja = 0
+                #============HOLIDAY
+                sum_month_holiday = 0
+                #============time_half
+                sum_month_time_half = 0
+                #================ DOUBLE TIME LYFE
+                sum_month_double_time = 0
+                #================ DOUBLE & HALF LYFE
+                sum_month_double_half = 0
+                #================ TRIPLE LYFE
+                sum_month_triple = 0
+                #================ OVERRIDES LYFE
+                sum_month_overrides = 0
+                #================ A-POSITION LYFE
+                sum_month_a_hours = 0
+                #============Totals
+                sum_month_total_credits = 0
+                #========Reserve No Fly=======
+                sum_month_reserve_no_fly_hours = 0
+
+                #HERE WILL BE A LINE OF FOR/INS THAT WILL TOTAL EACH CAT FOR THE YEAR
+                for month in all_cascade_patch_month:
+                    # if month.month_guarantee_hours != None:
+                    #     sum_month_guarantee_hours += month.month_guarantee_hours
+                    # if month.month_guarantee_hours_worked_rated != None:
+                    #     sum_month_guarantee_hours_worked_rated += month.month_guarantee_hours_worked_rated
+                    if month.month_tafb_total != None:
+                        sum_month_tafb_total += month.month_tafb_total
+                    if month.month_int_tafb_total != None:
+                        sum_month_int_tafb_total += month.month_int_tafb_total
+                    if month.month_tfp != None:
+                        sum_month_tfp += month.month_tfp
+                    if month.month_vacation_sick != None:
+                        sum_month_vacation_sick += month.month_vacation_sick
+                    if month.month_vja != None:
+                        sum_month_vja += month.month_vja
+                    if month.month_holiday != None:
+                        sum_month_holiday += month.month_holiday
+                    if month.month_time_half != None:
+                        sum_month_time_half += month.month_time_half
+                    if month.month_double_time != None:
+                        sum_month_double_time += month.month_double_time
+                    if month.month_double_half != None:
+                        sum_month_double_half += month.month_double_half
+                    if month.month_triple != None:
+                        sum_month_triple += month.month_triple
+                    if month.month_overrides != None:
+                        sum_month_overrides += month.month_overrides
+                    if month.month_a_hours != None:
+                        sum_month_a_hours += month.month_a_hours
+                    if month.month_total_credits != None:
+                        sum_month_total_credits += month.month_total_credits
+                    if month.month_duty_hours != None:
+                        sum_month_duty_hours += month.month_duty_hours
+                    if month.month_reserve_no_fly_hours != None:
+                        sum_month_reserve_no_fly_hours += month.month_reserve_no_fly_hours
+
+                    #THIS IS THE QUERY FOR THE YEAR WE'RE UPDATING WITH THE MONTHLY TOTALS 
+                    cascade_patch_year = Year.query.filter_by(id=cascade_patch_month.year_id).first()
+                    #THIS WILL BE LINES WHERE WE ASSIGN VALUE TO YEAR CATS WITH MONTHLY TOTALS
+                    #========New additions=======
+                    cascade_patch_year.year_duty_hours = sum_month_duty_hours
+                    #=============TAFB
+                    cascade_patch_year.year_tafb_total = sum_month_tafb_total
+                    cascade_patch_year.year_tafb_pay = tafb_pay(sum_month_tafb_total)
+                    #=============TAFB INT
+                    cascade_patch_year.year_int_tafb = sum_month_int_tafb_total
+                    cascade_patch_year.year_int_tafb_pay = int_tafb_pay(sum_month_int_tafb_total)
+                    #============VACATION/SICK
+                    cascade_patch_year.year_vacation_sick = sum_month_vacation_sick
+                    cascade_patch_year.year_vacation_sick_pay = tfp_pay_function(sum_month_vacation_sick)
+                    #============REGULAR TFP
+                    cascade_patch_year.year_tfp = sum_month_tfp
+                    cascade_patch_year.year_tfp_pay = tfp_pay_function(sum_month_tfp)
+                    #============VJA
+                    cascade_patch_year.year_vja = sum_month_vja
+                    cascade_patch_year.year_vja_rated= one_point_five_rate(sum_month_vja)
+                    cascade_patch_year.year_vja_pay= one_point_five_pay(sum_month_vja)
+                    # #============HOLIDAY
+                    cascade_patch_year.year_holiday = sum_month_holiday
+                    cascade_patch_year.year_holiday_rated= double_rate(sum_month_holiday)
+                    cascade_patch_year.year_holiday_pay= double_pay(sum_month_holiday)
+                    #============TIME_HALF
+                    cascade_patch_year.year_time_half = sum_month_time_half
+                    cascade_patch_year.year_time_half_rated= one_point_five_rate(sum_month_time_half)
+                    cascade_patch_year.year_time_half_pay= one_point_five_pay(sum_month_time_half)
+                    #============DOUBLE_TIME
+                    cascade_patch_year.year_double_time = sum_month_double_time
+                    cascade_patch_year.year_double_time_rated= more_better_function_rate(sum_month_double_time,2)
+                    cascade_patch_year.year_double_time_pay= more_better_function_pay(sum_month_double_time,2)
+                    #============DOUBLE_HALF
+                    cascade_patch_year.year_double_half = sum_month_double_half
+                    cascade_patch_year.year_double_half_rated= more_better_function_rate(sum_month_double_half,2.5)
+                    cascade_patch_year.year_double_half_pay= more_better_function_pay(sum_month_double_half,2.5)
+                    #============TRIPLE
+                    cascade_patch_year.year_triple = sum_month_triple
+                    cascade_patch_year.year_triple_rated= more_better_function_rate(sum_month_triple,3)
+                    cascade_patch_year.year_triple_pay= more_better_function_pay(sum_month_triple,3)
+                    #============OVERRIDES
+                    cascade_patch_year.year_overrides = sum_month_overrides
+                    cascade_patch_year.year_overrides_pay = override_pay(sum_month_overrides)
+                    #============A-POSITON
+                    cascade_patch_year.year_a_hours = sum_month_a_hours
+                    cascade_patch_year.year_a_pay = container_a_position_pay(sum_month_a_hours)
+                    # # #===============Reserve Nofly HOURS 
+                    cascade_patch_year.year_reserve_no_fly_hours = sum_month_reserve_no_fly_hours
+                    cascade_patch_year.year_reserve_no_fly_pay = tfp_pay_function(sum_month_reserve_no_fly_hours)
+                    # cascade_patch_year.year_guarantee_hours = sum_month_guarantee_hours
+                    # cascade_patch_year.year_guarantee_hours_worked_rated = sum_month_guarantee_hours_worked_rated
+                    #============Totals ACTUAL 
+                    cascade_patch_year.year_total_credits = totals(sum_month_reserve_no_fly_hours, sum_month_tfp,sum_month_vacation_sick,sum_month_vja,sum_month_holiday,sum_month_time_half,sum_month_double_time,sum_month_double_half,sum_month_triple)
+                    #============Totals RATED
+                    cascade_patch_year.year_total_credits_rated= totals(sum_month_reserve_no_fly_hours, sum_month_tfp,sum_month_vacation_sick,one_point_five_rate(sum_month_vja),double_rate(sum_month_holiday),one_point_five_rate(sum_month_time_half),more_better_function_rate(sum_month_double_time,2),more_better_function_rate(sum_month_double_half,2.5),more_better_function_rate(sum_month_triple,3))
+                    #============Totals PAY
+                    cascade_patch_year.year_total_pay = totals(tfp_pay_function(sum_month_reserve_no_fly_hours),tfp_pay_function(sum_month_tfp),tfp_pay_function(sum_month_vacation_sick),one_point_five_pay(sum_month_vja),double_pay(sum_month_holiday),one_point_five_pay(sum_month_time_half),more_better_function_pay(sum_month_double_time,2),more_better_function_pay(sum_month_double_half,2.5),more_better_function_pay(sum_month_triple,3), tafb_pay(sum_month_tafb_total),int_tafb_pay(sum_month_int_tafb_total),override_pay(sum_month_overrides),container_a_position_pay(sum_month_a_hours))
+                    # #=====================
+                    db.session.add(cascade_patch_year)
+                    db.session.commit()
+            print('this gonna work?', id_to_use)
+            response_dict = {"message": "deleted fo sho!"}
+            return response_dict, 200
 api.add_resource(CascadeTest, '/cascade_test/<int:id>')
 
 class Login(Resource):

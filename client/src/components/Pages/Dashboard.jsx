@@ -1,20 +1,30 @@
 /* eslint-disable no-unused-vars */
+//===========STATE MANAGMENT================
 import { useEffect, useState } from "react";
-import { Col, Row, Container, Button, Modal, Form } from "react-bootstrap";
 import useUserStore from "../../hooks/useStore";
-import Carousel from "react-bootstrap/Carousel";
+//========COMPONENTS===========================
 import PairingCard from "./PairingCard";
-import Table from "react-bootstrap/Table";
-import Dropdown from "react-bootstrap/Dropdown";
-import ProgressBar from "react-bootstrap/ProgressBar";
 import MonthPieChart from "./MonthPieChart";
 import MonthBarGraph from "./MonthBarGraph";
+import PairingAddModal from "./PairingAddModal";
+import MonthTotalAll from "./MonthTotalAll";
+//==========BOOTSTRAP IMPORTS ============
+import { Col, Row, Container, Button, Modal, Form } from "react-bootstrap";
+import Carousel from "react-bootstrap/Carousel";
+import Dropdown from "react-bootstrap/Dropdown";
+import ProgressBar from "react-bootstrap/ProgressBar";
+import DeleteYearModal from "./DeleteYearModal";
+import DeletePairingModal from "./DeletePairingModal";
 export default function Dashboard() {
   //   const today = new Date();
   //   const start = today.getMonth() + 1;
 
   //================ZUSTAND STATE STUFF=================
   const { user } = useUserStore();
+  // const [refreshOtherComponent, setRefreshOtherComponent] = useState(false);
+  // const handlePostSuccess = () => {
+  // setRefreshOtherComponent((prevRefresh) => !prevRefresh);
+  // };
   //================sloppy shit
   const [usersYears, setUsersYears] = useState([]);
   const [monthId, setMonthId] = useState(0);
@@ -154,6 +164,7 @@ export default function Dashboard() {
   const guarantee_hours = displayMonth[0]?.month_guarantee_hours;
   const guarantee_hours_worked =
     displayMonth[0]?.month_guarantee_hours_worked_rated;
+  //=============TOTALS ACCORDIAN STUFF======================
 
   return (
     <>
@@ -186,6 +197,7 @@ export default function Dashboard() {
                   <Button className="dropdown-item" onClick={handleShow}>
                     Add Year
                   </Button>
+                  {<DeleteYearModal usersYears={usersYears} />}
 
                   <Modal show={show} onHide={handleClose} animation={false}>
                     <Modal.Header closeButton>
@@ -247,10 +259,13 @@ export default function Dashboard() {
           ))}
         </Row>
       </Container>
-      <Container>
-        {/* this container has bot the carosel and the graphs in it */}
+      {/* ===============================Month Pie chart========================== */}
+      <Container className="m-0 p-0">
         <Row className="mt-5">
-          <Col lg={4}>
+          <Col lg={4} className="border p-1 ">
+            {betterMonth ? <MonthPieChart betterMonth={betterMonth} /> : null}
+          </Col>
+          {/* <Col lg={4}>
             {displayMonth[0]?.pairings_field.length > 0 ? (
               <Carousel className="custom-carousel" interval={null}>
                 {displayMonth[0]?.pairings_field.map((pairing) => (
@@ -262,9 +277,10 @@ export default function Dashboard() {
                 ))}
               </Carousel>
             ) : null}
-          </Col>
+          </Col> */}
+          {/* ===============================PROGRESS BARS========================== */}
           <Col lg={8} className="d-flex">
-            <Container className="border mx-auto text-center">
+            <Container className="  m-0 p-0 text-center">
               <Row>
                 <Container className="m-0 p-0">
                   {" "}
@@ -287,23 +303,54 @@ export default function Dashboard() {
                   ) : null}
                 </Container>
               </Row>
-              <Row className="justify-content-center">
-                <Col lg={6}>
+              {/* ===============================Carousel========================== */}
+              <Row className="justify-content-between  mt-2 ">
+                {/* <Col lg={5} className="border p-1 ">
                   {betterMonth ? (
                     <MonthPieChart betterMonth={betterMonth} />
                   ) : null}
+                </Col> */}
+                <Col lg={7}>
+                  {displayMonth[0]?.pairings_field.length > 0 ? (
+                    <Carousel className="custom-carousel" interval={null}>
+                      {displayMonth[0]?.pairings_field.map((pairing) => (
+                        <Carousel.Item key={pairing.id}>
+                          <div className="centered-card">
+                            <PairingCard pairing={pairing} />
+                          </div>
+                        </Carousel.Item>
+                      ))}
+                    </Carousel>
+                  ) : null}
                 </Col>
-                <Col lg={6}>
+                {/* ===============================BAR GRAPH MONTH========================== */}
+                <Col lg={5} className="border p-1 ">
                   {betterMonth ? (
                     <MonthBarGraph
-                      betterPairings={betterPairings}
                       betterMonth={betterMonth}
+                      // refresh={refreshOtherComponent}
                     />
                   ) : null}
-                  <Button className="mt-5 ">Add Pairing</Button>
+                  {betterMonth ? (
+                    <PairingAddModal
+                      displayMonth={displayMonth}
+                      // onPostSuccess={handlePostSuccess}
+                    />
+                  ) : null}
+                  {betterMonth ? (
+                    <DeletePairingModal
+                      displayMonth={displayMonth}
+                      // onPostSuccess={handlePostSuccess}
+                    />
+                  ) : null}
                 </Col>
               </Row>
             </Container>
+          </Col>
+        </Row>
+        <Row className="justify-content-center  mt-2 ">
+          <Col className="border m-0 p-0">
+            <MonthTotalAll />
           </Col>
         </Row>
       </Container>

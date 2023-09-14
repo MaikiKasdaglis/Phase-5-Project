@@ -7,27 +7,73 @@ import DaysBarGraph from "./DaysBarGraph";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import ListGroup from "react-bootstrap/ListGroup";
+import ReserveBlockToggle from "./ReserveBlockToggle";
 
 export default function PairingCard({ pairing }) {
   const [passPairing, setPassPairing] = useState({ pairing });
   // console.log("form state", passPairing);
   // console.log(pairing, `from pairing card`);
   const {
-    int_tafb_total,
-    pairing_a_hours,
-    pairing_double_half,
-    pairing_double_time,
-    pairing_holiday,
-    pairing_overrides,
-    pairing_tfp,
-    pairing_time_half,
-    pairing_triple,
-    pairing_vja,
+    pairing_name,
+    id,
+    // #===============Reserve Stuff
     reserve_block,
-    tafb_total,
+    pairing_guarantee_hours,
+    pairing_guarantee_hours_worked_rated,
 
+    // #=============TAFB
+    tafb_total,
+    tafb_pay,
+
+    int_tafb_total,
+    int_tafb_pay,
+
+    // #================TOTALS===================
+
+    // #================TFP LYFE
+    pairing_tfp,
+    pairing_tfp_pay,
+    // #================ VACATION/SICK LYFE
     pairing_vacation_sick,
+    pairing_vacation_sick_pay,
+    // #================VJA LYFE
+    pairing_vj,
+    pairing_vja_rate,
+    pairing_vja_pay,
+    // #================ HOLIDAY LYFE
+    pairing_holiday,
+    pairing_holiday_rated,
+    pairing_holiday_pay,
+    // #================ TIME_HALF
+    pairing_time_half,
+    pairing_time_half_rated,
+    pairing_time_half_pay,
+    // #================ DOUBLE TIME LYFE
+    pairing_double_time,
+    pairing_double_time_rated,
+    pairing_double_time_pay,
+    // #================ DOUBLE & HALF LYFE
+    pairing_double_half,
+    pairing_double_half_rated,
+    pairing_double_half_pay,
+    // #================ TRIPLE LYFE
+    pairing_triple,
+    pairing_triple_rated,
+    pairing_triple_pay,
+    // #================ OVERRIDES LYFE
+    pairing_overrides,
+    pairing_overrides_pay,
+    // #================ A-POSITION LYFE
+    pairing_a_hours,
+    pairing_a_pay,
+    // #============Totals
+    pairing_total_credits,
+    pairing_total_credits_rated,
+    pairing_total_pay,
+    // #========New additions=======
     pairing_duty_hours,
+    pairing_reserve_no_fly_hours,
+    pairing_reserve_no_fly_pay,
   } = pairing;
   // console.log(`day_field?`, pairing.days_field);
   // console.log(`pairing`, pairing.id);
@@ -35,6 +81,11 @@ export default function PairingCard({ pairing }) {
 
   return (
     <Card style={{ width: "18rem" }} className="m-0 p-0">
+      <ReserveBlockToggle
+        diff_reserve_block={reserve_block}
+        id={id}
+        pairing={pairing}
+      />
       <DaysBarGraph days={days} />
       <Link
         className="btn btn-dark rounded-0"
@@ -42,100 +93,293 @@ export default function PairingCard({ pairing }) {
         to="pairing_dashboard"
         state={{ passPairing: passPairing }}
       >
-        Go somewhere
+        Go To Pairing Dashboard
       </Link>
       <Card.Body className="m-0 p-1">
-        <Card.Title>{`Pairing Begin: ${pairing.pairing_name}`}</Card.Title>
+        {/* <Card.Title>{`${pairing_name} Totals:`}</Card.Title> */}
         <Card.Text>
-          <div>
-            <ul>
-              {int_tafb_total ? (
-                <li>TAFB International: {int_tafb_total}</li>
-              ) : null}
-              {tafb_total ? <li>TAFB: {tafb_total}</li> : null}
-
-              {pairing_tfp ? <li>Total Regular TFP: {pairing_tfp}</li> : null}
-              {pairing_holiday ? <li>Holiday: {pairing_holiday}</li> : null}
-              {pairing_double_half ? (
-                <li>Double Time & Half: {pairing_double_half}</li>
-              ) : null}
-              {pairing_double_time ? (
-                <li>Double Time: {pairing_double_time}</li>
-              ) : null}
-              {pairing_overrides ? (
-                <li>Total Overrides: {pairing_overrides}</li>
-              ) : null}
-              {pairing_time_half ? (
-                <li>Time & Half: {pairing_time_half}</li>
-              ) : null}
-              {pairing_triple ? <li>Triple Time: {pairing_triple}</li> : null}
-              {pairing_vja ? <li>V.J.A: {pairing_vja}</li> : null}
-              {reserve_block ? <li>Reserve Block: True</li> : null}
-
-              {pairing_vacation_sick ? (
-                <li>pairing_vacation_sick: {pairing_vacation_sick}</li>
-              ) : null}
-              {pairing_duty_hours ? (
-                <li> pairing_duty_hours: {pairing_duty_hours}</li>
-              ) : null}
-            </ul>
-            <ListGroup>
-              {" "}
-              {pairing_a_hours ? (
-                <ListGroup.Item action variant="light">
-                  A Position: {pairing_a_hours}
-                </ListGroup.Item>
-              ) : null}
-            </ListGroup>
-          </div>
+          <Accordion flush>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>
+                {<h5>{pairing_name} Totals</h5>}
+              </Accordion.Header>
+              <Accordion.Body>
+                <ListGroup>
+                  {" "}
+                  {reserve_block ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Reserve Block: True
+                    </ListGroup.Item>
+                  ) : null}
+                  {tafb_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      TAFB Pay: ${tafb_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {int_tafb_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Int. TAFB Pay: ${int_tafb_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_tfp_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Reg TFP: ${pairing_tfp_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_vacation_sick_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Vacation/Sick Pay: ${pairing_vacation_sick_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_vja_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      VJA Pay: ${pairing_vja_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_holiday_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Holiday Pay: ${pairing_holiday_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_time_half_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Overtime Pay: ${pairing_time_half_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_double_time_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Double Time Pay: ${pairing_double_time_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_double_half_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Double & Half Pay: ${pairing_double_half_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_triple_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Triple Time Pay: ${pairing_triple_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_overrides_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Overried Pay: ${pairing_overrides_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_a_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      A Pay: ${pairing_a_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_reserve_no_fly_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Reserve No Fly Pay: ${pairing_reserve_no_fly_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_total_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Total Pay: ${pairing_total_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_total_credits_rated ? (
+                    <ListGroup.Item
+                      action
+                      variant="primary"
+                      className="m-0 rounded-0"
+                    >
+                      Total Credits (rated): {pairing_total_credits_rated}
+                    </ListGroup.Item>
+                  ) : null}
+                </ListGroup>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
         </Card.Text>
         <Accordion flush>
           {pairing.days_field.map((day) => (
             <Accordion.Item key={day.id} eventKey={day.id}>
-              <Accordion.Header>{day.date}</Accordion.Header>
+              <Accordion.Header>{day.date} Totals</Accordion.Header>
               <Accordion.Body>
-                <div>
+                <ListGroup>
                   {" "}
-                  <ul>
-                    {day.type_of_day ? (
-                      <li>day.type_of_day: {day.type_of_day}</li>
-                    ) : null}
-                    {day.a_hours ? <li>day.a_hours: {day.a_hours}</li> : null}
-                    {day.a_position ? (
-                      <li>day.a_position: {day.a_position}</li>
-                    ) : null}
-                    {day.double_half ? (
-                      <li>day.double_half: {day.double_half}</li>
-                    ) : null}
-                    {day.double_time ? (
-                      <li>day.double_time: {day.double_time}</li>
-                    ) : null}
-                    {day.holiday ? <li>day.holiday: {day.holiday}</li> : null}
-                    {day.overrides ? (
-                      <li>day.overrides: {day.overrides}</li>
-                    ) : null}
-                    {day.reserve_no_fly ? (
-                      <li>day.reserve_no_fly: {day.reserve_no_fly}</li>
-                    ) : null}
-                    {day.time_half ? (
-                      <li>day.time_half: {day.time_half}</li>
-                    ) : null}
-                    {day.total_tfp ? (
-                      <li>day.total_tfp: {day.total_tfp}</li>
-                    ) : null}
-                    {day.triple ? <li>day.triple: {day.triple}</li> : null}
-                    {day.vja ? <li>day.vja: {day.vja}</li> : null}
-                    {day.vacation_sick ? (
-                      <li>day.vacation_sick: {day.vacation_sick}</li>
-                    ) : null}
-                    {day.daily_duty_hours ? (
-                      <li>day.daily_duty_hours: {day.daily_duty_hours}</li>
-                    ) : null}
-                    {day.comments ? (
-                      <li>day.comments: {day.comments}</li>
-                    ) : null}
-                  </ul>
-                </div>
+                  {day.total_tfp_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Reg TFP: ${day.total_tfp_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {pairing_vacation_sick_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Vacation/Sick Pay: ${day.vacation_sick_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.vja_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      VJA Pay: ${day.vja_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.holiday_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Holiday Pay: ${day.holiday_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.time_half_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Overtime Pay: ${day.time_half_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.double_time_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Double Time Pay: ${day.double_time_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.double_half_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Double & Half Pay: ${day.double_half_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.triple_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Triple Time Pay: ${day.triple_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.overrides_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Overried Pay: ${day.overrides_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.a_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      A Pay: ${day.a_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.reserve_no_fly_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Reserve No Fly Pay: ${day.reserve_no_fly_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.total_pay ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Total Pay: ${day.total_pay}
+                    </ListGroup.Item>
+                  ) : null}
+                  {day.total_credits_rated ? (
+                    <ListGroup.Item
+                      action
+                      variant="light"
+                      className="m-0 rounded-0"
+                    >
+                      Total Credits (rated): {day.total_credits_rated}
+                    </ListGroup.Item>
+                  ) : null}
+                </ListGroup>
               </Accordion.Body>
             </Accordion.Item>
           ))}
