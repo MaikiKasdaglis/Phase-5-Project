@@ -20,13 +20,14 @@ export default function RootLayout() {
         style={{ position: "relative", zIndex: "100" }}
       >
         <Container>
-          {/* <img
+          <img
             src="./public/IMG_9708.png"
             alt=""
             style={{ height: "100px" }}
             className="m-3 mt-0 mb-0"
-          /> */}
-          <Navbar.Brand href="#home">FA Pay Tracker</Navbar.Brand>
+          />
+
+          {/* <Navbar.Brand href="#home">FA Pay Tracker</Navbar.Brand> */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
@@ -38,15 +39,15 @@ export default function RootLayout() {
               {/* {user ? <h1>hi</h1> : null} */}
               {user ? (
                 <NavLink to="userinfo" className="nav-link">
-                  userinfo
+                  User Info
                 </NavLink>
               ) : null}
               {user ? (
                 <NavLink to="comparisonpage" className="nav-link">
-                  comparisonpage
+                  Compare
                 </NavLink>
               ) : null}
-              {user ? (
+              {/* {user ? (
                 <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                   <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                   <NavDropdown.Item href="#action/3.2">
@@ -60,7 +61,7 @@ export default function RootLayout() {
                     Separated link
                   </NavDropdown.Item>
                 </NavDropdown>
-              ) : null}
+              ) : null} */}
             </Nav>
             <Nav className="ml-auto">
               <NavDropdown

@@ -2,6 +2,7 @@
 import { Bar } from "react-chartjs-2";
 // import { useEffect } from "react";
 
+// eslint-disable-next-line no-unused-vars
 export default function MonthBarGraph({ betterMonth, refresh }) {
   const betterPairings = betterMonth.pairings_field;
   const labelsArray = betterPairings.map((pairing) => pairing.pairing_name);

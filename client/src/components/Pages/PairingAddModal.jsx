@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
@@ -72,7 +73,7 @@ function PairingAddModal({ displayMonth, onPostSuccess }) {
         return response.json();
       })
       .then((data) => {
-        // console.log(`this is the reponse from new pairing post`, data);
+        console.log(`this is the reponse from new pairing post`, data);
         // window.location.reload();
         // onPostSuccess();
       })

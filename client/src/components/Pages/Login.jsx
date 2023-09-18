@@ -11,7 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const { updateUser, user } = useUserStore();
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export default function Login() {
         console.log(user, `before`);
         updateUser(data);
         console.log(user, `after`);
-        //   navigate("/home");
+        navigate("/userinfo");
       })
       .catch((error) => {
         console.log("error", error.message);
@@ -56,7 +56,7 @@ export default function Login() {
           border: "5px, black",
         }}
       >
-        <Row className="justify-content-center">
+        <Row className="justify-content-center mt-5">
           <Col lg={6}>
             <Form className="border p-4" onSubmit={(e) => handleLogin(e)}>
               <Form.Group className="mb-3" controlId="formBasicUsername">
@@ -79,13 +79,13 @@ export default function Login() {
                 />
               </Form.Group>
 
-              <Button variant="dark" type="submit" className="m-1 ">
+              <Button variant="dark" type="submit" className="m-1 rounded-0">
                 Login
               </Button>
 
               <Link
                 style={{ marginLeft: "5px" }}
-                className="btn btn-secondary"
+                className="btn btn-secondary rounded-0"
                 variant="secondary"
                 to="signup"
                 activeClassName="active"

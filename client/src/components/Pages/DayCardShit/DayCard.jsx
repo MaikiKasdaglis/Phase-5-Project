@@ -1,8 +1,10 @@
+/* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
+import Accordion from "react-bootstrap/Accordion";
 import {
   Container,
   Row,
@@ -195,15 +197,6 @@ export default function DayCard({ day, passPairing }) {
           reserve_no_fly_holiday: noFlyHoliday,
         });
 
-    // const updatedFormValues = {
-    //   ...formValues,
-    //   a_position: aPosition,
-    //   daily_duty_hours: formattedHours,
-    //   reserve_no_fly: noFly,
-    //   reserve_no_fly_holiday: noFlyHoliday,
-    // };
-    // Check if any input values have changed
-    // console.log("Submitting new values:", updatedFormValues);
     fetch(`/api/cascade_test/${id}`, {
       method: "PATCH",
       headers: {
@@ -235,40 +228,48 @@ export default function DayCard({ day, passPairing }) {
       body: JSON.stringify(),
     });
   }
-
+  const number = total_pay / daily_duty_hours;
+  const formNum = number >= 0 ? number.toFixed(2) : 0;
   return (
     <>
       <Col lg={4} className="mt-3">
-        <Card className="">
+        <Card className="m-0 p-0">
           {/* //===============MAYBE DISPLAY SHIT====================== */}
-          {/* <div class="grid-container" style={{ position: "sticky", top: 0 }}>
-          <div class="grid-item">
-            <h6>Total Pay</h6>
-            <p class="large-text">${total_pay}</p>
-          </div>
-          <div class="grid-item">
-            <h6>Total Credits</h6>
-            <p class="large-text">{total_credits_rated}</p>
-          </div>
-          <div class="grid-item">
-            <h6>Average Pay</h6>
-            <p class="large-text"> FIX THIS</p>
-          </div>
-          <div class="grid-item">
-            <h6>Total Overrides</h6>
-            <p class="large-text">${overrides_pay}</p>
-          </div>
-        </div> */}
-
+          <Accordion className="m-0 p-0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>{date} Quick View </Accordion.Header>
+              <Accordion.Body>
+                <div
+                  class="grid-container"
+                  style={{ position: "sticky", top: 0 }}
+                >
+                  <div class="grid-item">
+                    <h6>Total Pay</h6>
+                    <p class="large-text">${total_pay}</p>
+                  </div>
+                  <div class="grid-item">
+                    <h6>Total Credits</h6>
+                    <p class="large-text">{total_credits_rated}</p>
+                  </div>
+                  <div class="grid-item">
+                    <h6>Average Pay Duty Hour</h6>
+                    <p class="large-text"> ${formNum}</p>
+                  </div>
+                  <div class="grid-item">
+                    <h6>Total Overrides</h6>
+                    <p class="large-text">${overrides_pay}</p>
+                  </div>
+                </div>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+          .
           <Form onSubmit={handleSubmit}>
             <Card.Body>
               <Card.Title>{date}</Card.Title>
               {/* <Card.Text>
-                what the fuck else goes on this card? for sure the day level
-                BOOLEANS
               </Card.Text> */}
             </Card.Body>
-            <div></div>
             <Container>
               <Row>
                 <Col className="d-flex align-items-center">

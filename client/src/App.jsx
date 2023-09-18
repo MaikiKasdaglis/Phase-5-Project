@@ -17,8 +17,7 @@ import Logout from "./components/Pages/Logout";
 import Signup from "./components/Pages/Signup";
 import PairingDashboard from "./components/Pages/PairingDashboardshit/PairingDashboard";
 import UserInfo from "./components/Pages/UserInfo";
-import ComparisonPage from "./components/Pages/ComparisonPage";
-
+import ComparisonPage from "./components/Pages/ComparisonStuff/ComparisonPage";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>

@@ -32,6 +32,7 @@ export default function Dashboard() {
   const [displayYear, setDisplayYear] = useState();
   const [selectedMonthId, setSelectedMonthId] = useState(null);
   // console.log(monthId);
+  console.log("make better", usersYears[1]);
   //=============MODAL STUFF======================
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -94,10 +95,8 @@ export default function Dashboard() {
       .then((data) => {
         console.log("response data, prob the year?", data);
 
-        // Add the new dog to the userDogs array
         setUsersYears([...usersYears, data]);
 
-        // Reset the dogObj state to clear the input fields
         setYearObj({
           user_id: user.id,
           year: 0,
@@ -265,19 +264,6 @@ export default function Dashboard() {
           <Col lg={4} className="border p-1 ">
             {betterMonth ? <MonthPieChart betterMonth={betterMonth} /> : null}
           </Col>
-          {/* <Col lg={4}>
-            {displayMonth[0]?.pairings_field.length > 0 ? (
-              <Carousel className="custom-carousel" interval={null}>
-                {displayMonth[0]?.pairings_field.map((pairing) => (
-                  <Carousel.Item key={pairing.id}>
-                    <div className="centered-card">
-                      <PairingCard pairing={pairing} />
-                    </div>
-                  </Carousel.Item>
-                ))}
-              </Carousel>
-            ) : null}
-          </Col> */}
           {/* ===============================PROGRESS BARS========================== */}
           <Col lg={8} className="d-flex">
             <Container className="  m-0 p-0 text-center">
@@ -305,11 +291,6 @@ export default function Dashboard() {
               </Row>
               {/* ===============================Carousel========================== */}
               <Row className="justify-content-between  mt-2 ">
-                {/* <Col lg={5} className="border p-1 ">
-                  {betterMonth ? (
-                    <MonthPieChart betterMonth={betterMonth} />
-                  ) : null}
-                </Col> */}
                 <Col lg={7}>
                   {displayMonth[0]?.pairings_field.length > 0 ? (
                     <Carousel className="custom-carousel" interval={null}>
