@@ -9,7 +9,7 @@ function PairingAddModal({ displayMonth, onPostSuccess }) {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   //=============MONTH STUFF=================
-  console.log(displayMonth[0].pairings_field, "from modal");
+  // console.log(displayMonth[0].pairings_field, "from modal");
   const num = displayMonth[0].pairings_field.length + 1;
   //=============POST OBJ====================
   const [postObj, setPostObj] = useState({
@@ -52,9 +52,11 @@ function PairingAddModal({ displayMonth, onPostSuccess }) {
     reserve_block: false,
     tafb_pay: 0,
     tafb_total: 0.0,
+    pairing_reserve_no_fly_hours: 0.0,
+    pairing_reserve_no_fly_pay: 0.0,
   });
   function handleSubmit() {
-    // console.log(postObj);
+    console.log(postObj);
     handleClose();
     fetch("/api/pairings", {
       method: "POST",

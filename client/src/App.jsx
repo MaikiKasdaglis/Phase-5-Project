@@ -15,7 +15,9 @@ import Dashboard from "./components/Pages/Dashboard";
 import Login from "./components/Pages/Login";
 import Logout from "./components/Pages/Logout";
 import Signup from "./components/Pages/Signup";
-import PairingDashboard from "./components/Pages/PairingDashboard";
+import PairingDashboard from "./components/Pages/PairingDashboardshit/PairingDashboard";
+import UserInfo from "./components/Pages/UserInfo";
+import ComparisonPage from "./components/Pages/ComparisonPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +26,8 @@ const router = createBrowserRouter(
       <Route path="logout" element={<Logout />} />
       <Route path="login/signup" element={<Signup />} />
       <Route path="dashboard" element={<Dashboard />} />
+      <Route path="userinfo" element={<UserInfo />} />
+      <Route path="comparisonpage" element={<ComparisonPage />} />
       <Route
         path="dashboard/pairing_dashboard"
         element={<PairingDashboard />}

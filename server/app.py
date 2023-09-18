@@ -289,6 +289,12 @@ class Years(Resource):
                         pairing_a_hours = 0,
                         pairing_duty_hours = 0,
                         pairing_vacation_sick = 0,
+                        pairing_reserve_no_fly_hours = 0.0,
+                        pairing_reserve_no_fly_pay = 0.0,
+                        pairing_total_credits = 0,
+                        pairing_total_credits_rated = 0,
+                        pairing_total_pay = 0,
+
                     )
                     db.session.add(new_pairing)
                     db.session.commit()
@@ -298,18 +304,40 @@ class Years(Resource):
                             pairing_id=new_pairing.id,
                             date=day_names[day],
                             total_tfp=0,
+                            total_tfp_pay = 0,
                             vja= 0,
+                            vja_pay = 0,
+                            vja_rated = 0,
                             holiday= 0,
+                            holiday_pay = 0,
+                            holiday_rated = 0,
                             time_half= 0,
+                            time_half_pay = 0,
+                            time_half_rated = 0,
                             double_time= 0,
+                            double_time_pay = 0,
+                            double_time_rated = 0,
                             double_half= 0,
+                            double_half_pay = 0,
+                            double_half_rated = 0,
                             triple= 0,
+                            triple_pay = 0,
+                            triple_rated = 0,
                             a_hours = 0,
+                            a_pay = 0,
                             overrides=0,
+                            overrides_pay = 0,
                             reserve_no_fly=False,
+                            reserve_no_fly_holiday = 0,
+                            reserve_no_fly_hours = 0,
+                            reserve_no_fly_pay = 0,
+                            total_credits = 0,
+                            total_credits_rated = 0,
+                            total_pay = 0,
                             a_position = False,
                             daily_duty_hours = 0,
                             vacation_sick = 0,
+                            vacation_sick_pay = 0,
                             comments = '',
                             type_of_day =  'TBD'
                         )
@@ -791,7 +819,7 @@ class PairingsById(Resource):
                 db.session.commit()
 
                 all_cascade_patch_pairing =Pairing.query.filter_by(month_id=response_obj.month_id)
-                     #===============Reserve Stuff 
+                #===============Reserve Stuff 
                 sum_pairing_guarantee_hours = 0
                 sum_pairing_guarantee_hours_worked_rated = 0
                 #=============TAFB
@@ -1339,6 +1367,7 @@ class Days(Resource):
         return make_response(days, 200)
     def post(self):
         request_obj = request.get_json()
+        print('this is the day request obj', request_obj)
         try:
             new_day = Day(
                 date = request_obj["date"],
@@ -1403,6 +1432,26 @@ class Days(Resource):
             # total = tfp_pay_function(request_obj["total_tfp"])
             db.session.add(new_day)
             db.session.commit()
+            cascade_patch_pairing = Pairing.query.filter_by(id=new_day.pairing_id).first()
+            # print('this is the day cascade_patch_pairing', cascade_patch_pairing)
+            day_count = Day.query.filter_by(pairing_id=cascade_patch_pairing.id).count()
+            if cascade_patch_pairing.reserve_block:
+                cascade_patch_pairing.pairing_guarantee_hours = 6 * day_count
+            else:
+                cascade_patch_pairing.pairing_guarantee_hours = 0
+            db.session.add(cascade_patch_pairing)
+            db.session.commit()
+            all_cascade_patch_pairing =Pairing.query.filter_by(month_id=cascade_patch_pairing.month_id)
+            #===============Reserve Stuff 
+            sum_pairing_guarantee_hours = 0
+            for pairing in all_cascade_patch_pairing:
+                if pairing.pairing_guarantee_hours != None:
+                        sum_pairing_guarantee_hours += pairing.pairing_guarantee_hours
+            cascade_patch_month = Month.query.filter_by(id=cascade_patch_pairing.month_id).first()
+            cascade_patch_month.month_guarantee_hours = sum_pairing_guarantee_hours
+            db.session.add(cascade_patch_month)
+            db.session.commit()
+
         except Exception as e:
             message = {'errors': [e.__str__()]}
             return make_response(message, 422)
@@ -1825,6 +1874,8 @@ class CascadeTest(Resource):
             try:
                 for attr in request_object:
                     setattr(response_obj, attr, request_object[attr])
+                if "daily_duty_hours" in request_object:
+                    response_obj.daily_duty_hours = request_object["daily_duty_hours"]
                  #============VACATION/SICK
                 if "vacation_sick" in request_object:
                     response_obj.vacation_sick_pay = tfp_pay_function(request_object["vacation_sick"])

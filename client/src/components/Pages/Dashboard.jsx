@@ -348,9 +348,12 @@ export default function Dashboard() {
             </Container>
           </Col>
         </Row>
+        {/* ================Accordian Totals=================== */}
         <Row className="justify-content-center  mt-2 ">
           <Col className="border m-0 p-0">
-            <MonthTotalAll />
+            {displayMonth[0]?.pairings_field.length > 0 ? (
+              <MonthTotalAll betterMonth={betterMonth} />
+            ) : null}
           </Col>
         </Row>
       </Container>

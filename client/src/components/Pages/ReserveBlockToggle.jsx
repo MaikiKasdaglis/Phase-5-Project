@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 function ReserveBlockToggle({ diff_reserve_block, id, pairing }) {
   const [isSwitchOn, setIsSwitchOn] = useState(false);
   const [updateObj, setUpdateObj] = useState({});
-
+  // console.log("this is the id", id);
   useEffect(() => {
     const updatedOg = { ...pairing };
     delete updatedOg.days_field;
@@ -27,6 +27,9 @@ function ReserveBlockToggle({ diff_reserve_block, id, pairing }) {
     const newObj = {
       ...updateObj,
       reserve_block: isChecked,
+      pairing_reserve_no_fly_hours: 0,
+
+      pairing_reserve_no_fly_pay: 0,
     };
     // console.log(newObj);
     fetch(`/api/pairings/${id}`, {

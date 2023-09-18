@@ -38,3 +38,20 @@ ul {
 .carousel-indicators {
   display: none;
 }
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+}
+
+.grid-item {
+  text-align: center;
+  padding: 20px;
+  background: #f4f4f4;
+}
+
+.large-text {
+  font-size: 20px;
+  margin-top: 10px;
+  color: blue;
+}
