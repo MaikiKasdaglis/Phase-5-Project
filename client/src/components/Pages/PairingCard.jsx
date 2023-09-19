@@ -268,7 +268,7 @@ export default function PairingCard({ pairing }) {
                       variant="light"
                       className="m-0 rounded-0"
                     >
-                      Reg TFP: ${day.total_tfp_pay}
+                      Reg TFP: ${day.total_tfp_pay.toFixed(2)}
                     </ListGroup.Item>
                   ) : null}
                   {pairing_vacation_sick_pay ? (

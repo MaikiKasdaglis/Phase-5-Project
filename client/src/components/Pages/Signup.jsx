@@ -38,9 +38,10 @@ export default function Signup() {
   const { updateUser } = useUserStore();
 
   const handleSubmit = (event) => {
+    event.preventDefault();
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
+      // event.preventDefault();
       event.stopPropagation();
       console.log("this is my obj", signupObj);
       fetch("/api/users", {
@@ -272,37 +273,31 @@ export default function Signup() {
           </Col>
         </Row>
 
-        <Form.Group className="mb-3">
-          <div className="d-flex align-items-center justify-content-center">
+        <Form.Group className="mb-0">
+          <div className="d-flex align-items-center justify-content-center ">
             <Form.Check
               required
               // label="Agree to terms and conditions"
               feedback="You must agree before submitting."
               feedbackType="invalid"
-              checked={readAgreements}
-              onChange={(e) => setReadAgreements(!readAgreements)}
             />
             <TermsConditions setReadAgreements={setReadAgreements} />
-            {/* <Form.Label
-              className="m-2 text-primary text-underline cursor-pointer"
-              onClick={(e) => console.log("clickin")}
-              htmlFor="custom-switch"
-            >
-              <a href="#" className="link-unstyled">
-                Agree to terms and conditions
-              </a>
-            </Form.Label> */}
           </div>
         </Form.Group>
 
         <Button
           variant="secondary"
-          className="m-1 rounded-0 "
+          className="m-1 rounded-0  mt-0"
           onClick={() => navigate("/login")}
         >
           Back To Login
         </Button>
-        <Button type="submit" variant="dark" className="m-1 rounded-0 ">
+        <Button
+          type="submit"
+          variant="dark"
+          className="m-1 rounded-0 mt-0"
+          // disabled={!readAgreements}
+        >
           Signup
         </Button>
       </Form>

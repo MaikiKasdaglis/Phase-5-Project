@@ -6,9 +6,10 @@ import DayAdder from "./DayAdder";
 import TafbForm from "./TafbForm";
 export default function PairingDashboard() {
   const location = useLocation();
+  console.log(location, "this is location");
   const passPairing = location.state.passPairing;
 
-  console.log("Received pairing object:", passPairing.pairing.days_field);
+  console.log("Received pairing object:", passPairing.pairing);
   return (
     <>
       <Container className="mt-5">
@@ -18,6 +19,9 @@ export default function PairingDashboard() {
           </Col>
           <Col lg={2}>
             <DayAdder passPairing={passPairing} />
+          </Col>
+          <Col lg={6}>
+            <h3>{passPairing.pairing.pairing_name}</h3>
           </Col>
         </Row>
       </Container>

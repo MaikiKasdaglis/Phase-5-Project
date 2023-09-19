@@ -68,38 +68,38 @@ def a_position_hours(*hours):
     sum = 0 
     for n in hours:
         sum = sum + n
-    return sum
+    return round(sum, 2)
 def a_position_pay(position, hours):
     if position:
         user = User.query.filter(User.id == session.get('user_id')).first()
         total = user.a_postion_pay * hours
-        return total 
+        return round(total, 2) 
     else:
         return 0 
 def container_a_position_pay(hours):
         user = User.query.filter(User.id == session.get('user_id')).first()
         total = user.a_postion_pay * hours
-        return total 
+        return round(total, 2) 
 
 def override_pay(overrides):
     user = User.query.filter(User.id == session.get('user_id')).first()
     total = user.override_pay * overrides
-    return total 
+    return round(total, 2) 
 
 def tafb_pay(tafb):
     user = User.query.filter(User.id == session.get('user_id')).first()
     total = user.per_diem_pay * tafb
-    return total
+    return round(total, 2)
 def int_tafb_pay(tafb):
     user = User.query.filter(User.id == session.get('user_id')).first()
     total = user.international_per_diem_pay * tafb
-    return total
+    return round(total, 2)
 #===========================Totals=========================
 def totals(*hours):
     sum = 0 
     for n in hours:
         sum = sum + n
-    return sum
+    return round(sum, 2)
 #=====================================================================
 
 @app.route('/')
@@ -2696,7 +2696,7 @@ class CascadeTest(Resource):
                     cascade_patch_year.year_vacation_sick = sum_month_vacation_sick
                     cascade_patch_year.year_vacation_sick_pay = tfp_pay_function(sum_month_vacation_sick)
                     #============REGULAR TFP
-                    cascade_patch_year.year_tfp = sum_month_tfp
+                    cascade_patch_year.year_tfp = round(sum_month_tfp,2)
                     cascade_patch_year.year_tfp_pay = tfp_pay_function(sum_month_tfp)
                     #============VJA
                     cascade_patch_year.year_vja = sum_month_vja

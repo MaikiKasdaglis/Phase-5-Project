@@ -20,12 +20,12 @@ export default function RootLayout() {
         style={{ position: "relative", zIndex: "100" }}
       >
         <Container>
-          <img
+          {/* <img
             src="./public/IMG_9708.png"
             alt=""
             style={{ height: "100px" }}
             className="m-3 mt-0 mb-0"
-          />
+          /> */}
 
           {/* <Navbar.Brand href="#home">FA Pay Tracker</Navbar.Brand> */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
