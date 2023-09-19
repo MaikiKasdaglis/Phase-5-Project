@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable react/prop-types */
+// eslint-disable-next-line no-unused-vars
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -31,9 +32,9 @@ function DeletePairingModal({ displayMonth }) {
       });
     handleClose();
   }
-  useEffect(() => {
-    console.log("refreshing, isnt it? ");
-  }, [displayMonth]);
+  // useEffect(() => {
+  //   console.log("refreshing, isnt it? ");
+  // }, [displayMonth]);
 
   return (
     <>

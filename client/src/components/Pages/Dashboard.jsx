@@ -25,14 +25,85 @@ export default function Dashboard() {
   // const handlePostSuccess = () => {
   // setRefreshOtherComponent((prevRefresh) => !prevRefresh);
   // };
-  //================sloppy shit
+  //================STATE FOR DOM RENDER
+  //=================================== usersYears THIS IS SET IN INITIAL FETCH REQUEST THIS IS WHATS MAPPED ON TO MAKE THE YEARS IN YEAR DROPDOWN. WHEN A DROPDOWN YEAR IS CLICKED, USERSMONTHS ARE SET
   const [usersYears, setUsersYears] = useState([]);
-  const [monthId, setMonthId] = useState(0);
-  const [usersMonths, setUsersMonths] = useState([]);
+  //=================================== displayYear THIS IS SET WHEN USER CLICKS ON A YEAR FROM THE DROPDOWN I THINK ALL IT DOES IS DISPLAY THE YEAR ON THE BUTTON
   const [displayYear, setDisplayYear] = useState();
+  //=================================== usersMonths THIS IS SET WHEN USER CLICKS ON A YEAR FROM THE DROPDOWN IT IS WHATS MAPPED TO MAKE THE MONTH BUTTONS
+  const [usersMonths, setUsersMonths] = useState([]);
+
+  //=================================== monthId THIS IS SET WHEN USER CLICKS ON A MONTH MAPPED FROM USERSMONTHS
+  //====SEEMS TO BUT USED TO FILTER usersMonths AND SET THE DISPLAY MONTH
+  const [monthId, setMonthId] = useState(0);
+  //=================================== selectedMonthId THIS IS SET WHEN USER CLICKS ON A MONTH MAPPED FROM USERSMONTHS
+  //====SEEMS TO BUT USED TO SHOW ACTIVE MONTH. MAYBE USELESS BUT I'M JUST GONNA LEAVE IT.
   const [selectedMonthId, setSelectedMonthId] = useState(null);
   // console.log(monthId);
-  console.log("make better", usersYears[1]);
+
+  //====localStorage Setter Getter
+  useEffect(() => {
+    try {
+      //===================DISPLAY YEAR
+      const yearText = window?.localStorage.getItem("MY_Display_Year");
+      if (yearText) {
+        const parsedYear = JSON.parse(yearText);
+        setDisplayYear(parsedYear);
+      } else {
+        setDisplayYear(null);
+      }
+
+      //===================USERS MONTHS
+      const monthButtons = window?.localStorage.getItem("MY_MONTH_BUTTONS");
+      if (monthButtons) {
+        const parsedMonths = JSON.parse(monthButtons);
+        setUsersMonths(parsedMonths);
+      } else {
+        setUsersMonths([]);
+      }
+
+      //===================MONTH ID (DUMB)
+      const idForMonth = window?.localStorage.getItem("MY_MONTH_ID");
+      if (idForMonth) {
+        const parsedMonthId = JSON.parse(idForMonth);
+        setMonthId(parsedMonthId);
+      } else {
+        setMonthId(null);
+      }
+
+      //===================SELECTED MONTH ID (REDUNDANT, BUT IT AIN'T BROKE)
+      const idForSelectedMonth = window?.localStorage.getItem(
+        "MY_SELECTED_MONTH_ID"
+      );
+      if (idForSelectedMonth) {
+        const parsedSelectedMonthId = JSON.parse(idForSelectedMonth);
+        setSelectedMonthId(parsedSelectedMonthId);
+      } else {
+        setSelectedMonthId(null);
+      }
+    } catch (error) {
+      console.error("Error handling localStorage data:", error);
+      // Handle the error as needed
+    }
+  }, []);
+  //====localStorage Setter usersMonths
+  useEffect(() => {
+    //===================DISPLAY YEAR
+    window.localStorage.setItem("MY_Display_Year", JSON.stringify(displayYear));
+    //===================USERS MONTHS
+    window.localStorage.setItem(
+      "MY_MONTH_BUTTONS",
+      JSON.stringify(usersMonths)
+    );
+    //===================MONTH ID (DUMB)
+    window.localStorage.setItem("MY_MONTH_ID", JSON.stringify(monthId));
+    //===================SELECTED MONTH ID (REDUNDAT, BUT IT AIN'T BROKE)
+    window.localStorage.setItem(
+      "MY_SELECTED_MONTH_ID",
+      JSON.stringify(selectedMonthId)
+    );
+  }, [displayYear, usersMonths, monthId, selectedMonthId]);
+
   //=============MODAL STUFF======================
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -140,12 +211,14 @@ export default function Dashboard() {
         console.log("error", error.message);
       });
   };
+  //============= END MODAL STUFF======================
   //=============CAROUSEL STUFF======================
   const [index, setIndex] = useState(0);
   const handleSelect = (selectedIndex) => {
     setIndex(selectedIndex);
   };
-
+  //============= END CAROUSEL STUFF======================
+  //========================================================INITIAL USER FETCH SETS USERS YEARS
   useEffect(() => {
     fetch(`/api/users/${user.id}`)
       .then((response) => response.json())
@@ -154,12 +227,15 @@ export default function Dashboard() {
       });
   }, []);
 
-  // console.log(usersMonths);
-  const displayMonth = usersMonths.filter((month) => month.id === monthId);
-  // console.log(displayMonth);
+  //=============================MOSTLY USED IN GRAPHS/MODALS. SEEMS TO FIX SOME ASYNC ISSSUES
+  // ============monthId is set when user clicks on month button mapped from USERSMONTHS
+  // displayMonth is an array of one month. annoying, right?
+  const displayMonth = usersMonths?.filter((month) => month.id === monthId);
+  //==========betterMonth is same as displayMonth, just popped outta the array
   const betterMonth = displayMonth[0];
+  //============tried doing betterPairings instead of passing betterMonth or displayMonth[0] but ran into async issues. so its unused.
   const betterPairings = betterMonth?.pairings_field;
-  // console.log("works?", betterPairings);
+  //========================================USED FOR PRGRESS BARS
   const guarantee_hours = displayMonth[0]?.month_guarantee_hours;
   const guarantee_hours_worked =
     displayMonth[0]?.month_guarantee_hours_worked_rated;
@@ -176,7 +252,7 @@ export default function Dashboard() {
           <Col xs="auto">
             <Dropdown>
               <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                {displayYear ? displayYear.year : "Select Year"}
+                {displayYear ? displayYear : "Select Year"}
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
@@ -185,7 +261,8 @@ export default function Dashboard() {
                     className="dropdown-item"
                     key={year.id}
                     onClick={(e) => {
-                      setUsersMonths(year.months_field), setDisplayYear(year);
+                      setUsersMonths(year.months_field),
+                        setDisplayYear(year.year);
                     }}
                   >
                     {year.year}

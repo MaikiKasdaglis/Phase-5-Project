@@ -50,7 +50,7 @@ function MonthTotalAll({ betterMonth }) {
     month_vja_rated,
     year,
   } = betterMonth;
-  const test = month_total_credits.toFixed(2);
+  // const test = month_total_credits.toFixed(2);
 
   return (
     <Accordion flush className="mt-2 p-0">

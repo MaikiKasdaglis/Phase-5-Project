@@ -12,6 +12,7 @@ import {
   Button,
   Table,
   FormControl,
+  Modal,
 } from "react-bootstrap";
 import Figure from "react-bootstrap/Figure";
 import Form from "react-bootstrap/Form";
@@ -217,6 +218,11 @@ export default function DayCard({ day, passPairing }) {
         console.log("error", error.message);
       });
   };
+  //=======MODAL AND DELETE DAY STUFF
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   function handleDelete(id) {
     // console.log("gonna delete", id);
@@ -227,6 +233,8 @@ export default function DayCard({ day, passPairing }) {
       },
       body: JSON.stringify(),
     });
+
+    handleClose();
   }
   const number = total_pay / daily_duty_hours;
   const formNum = number >= 0 ? number.toFixed(2) : 0;
@@ -459,7 +467,7 @@ export default function DayCard({ day, passPairing }) {
             <Card.Body>
               {/* <Card.Link href="#">Card Link</Card.Link> */}
               {/* <Card.Link href="#">Another Link</Card.Link> */}
-              <Button
+              {/* <Button
                 onMouseEnter={() => setThisWorks("danger")}
                 onMouseLeave={() => setThisWorks("dark")}
                 type="submit"
@@ -468,7 +476,44 @@ export default function DayCard({ day, passPairing }) {
                 onClick={(e) => handleDelete(id)}
               >
                 Delete
+              </Button> */}
+              <Button
+                onMouseEnter={() => setThisWorks("danger")}
+                onMouseLeave={() => setThisWorks("dark")}
+                type="submit"
+                className="rounded-0  m-1 mt-0 mb-0"
+                variant={thisWorks}
+                onClick={handleShow}
+              >
+                DELETE {date}
               </Button>
+
+              <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                  {/* <Modal.Title>Modal heading</Modal.Title> */}
+                </Modal.Header>
+                <Modal.Body className="text-center">
+                  Are you sure you want to delete {date}?
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button
+                    className="rounded-0  m-1 mt-0 mb-0"
+                    variant="secondary"
+                    onClick={handleClose}
+                  >
+                    Go Back
+                  </Button>
+                  <Button
+                    className="rounded-0  m-1 mt-0 mb-0"
+                    onMouseEnter={() => setThisWorks("danger")}
+                    onMouseLeave={() => setThisWorks("dark")}
+                    variant={thisWorks}
+                    onClick={() => handleDelete(id)}
+                  >
+                    Yes Delete
+                  </Button>
+                </Modal.Footer>
+              </Modal>
               <Button
                 variant="dark"
                 type="submit"
