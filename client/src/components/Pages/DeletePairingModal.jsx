@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
-function DeletePairingModal({ displayMonth }) {
+// eslint-disable-next-line no-unused-vars
+function DeletePairingModal({ displayMonth, setForce, force }) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -31,6 +32,8 @@ function DeletePairingModal({ displayMonth }) {
         console.error("Error deleting pairing:", error);
       });
     handleClose();
+    // setForce(!force);
+    // console.log("force from delete", force);
   }
   // useEffect(() => {
   //   console.log("refreshing, isnt it? ");

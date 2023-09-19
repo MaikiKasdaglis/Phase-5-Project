@@ -41,6 +41,10 @@ export default function Dashboard() {
   const [selectedMonthId, setSelectedMonthId] = useState(null);
   // console.log(monthId);
 
+  //=====================================testing some state that changes with delete pairing i can use as useEffect dependancy. it didn't work
+  // const [force, setForce] = useState(false);
+  // console.log("force from ogstate", force);
+
   //====localStorage Setter Getter
   useEffect(() => {
     try {
@@ -230,16 +234,27 @@ export default function Dashboard() {
   //=============================MOSTLY USED IN GRAPHS/MODALS. SEEMS TO FIX SOME ASYNC ISSSUES
   // ============monthId is set when user clicks on month button mapped from USERSMONTHS
   // displayMonth is an array of one month. annoying, right?
-  const displayMonth = usersMonths?.filter((month) => month.id === monthId);
+  let displayMonth = usersMonths?.filter((month) => month.id === monthId);
   //==========betterMonth is same as displayMonth, just popped outta the array
   const betterMonth = displayMonth[0];
+  console.log("this is better month", betterMonth);
   //============tried doing betterPairings instead of passing betterMonth or displayMonth[0] but ran into async issues. so its unused.
   const betterPairings = betterMonth?.pairings_field;
   //========================================USED FOR PRGRESS BARS
   const guarantee_hours = displayMonth[0]?.month_guarantee_hours;
   const guarantee_hours_worked =
     displayMonth[0]?.month_guarantee_hours_worked_rated;
-  //=============TOTALS ACCORDIAN STUFF======================
+  //=============new new? ======================
+  const [testMonth, setTestMonth] = useState({});
+  useEffect(() => {
+    fetch(`/api/months/${monthId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setTestMonth(data);
+        console.log("this is data we just fetched", data);
+        console.log('this is "betterMonth for graph"', betterMonth);
+      });
+  }, [monthId]);
 
   return (
     <>
@@ -398,6 +413,9 @@ export default function Dashboard() {
                   {betterMonth ? (
                     <DeletePairingModal
                       displayMonth={displayMonth}
+
+                      // setForce={setForce}
+                      // force={force}
                       // onPostSuccess={handlePostSuccess}
                     />
                   ) : null}
