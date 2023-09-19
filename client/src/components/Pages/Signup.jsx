@@ -1,15 +1,18 @@
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
+import Nav from "react-bootstrap/Nav";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import useUserStore from "../../hooks/useStore";
 import { useNavigate } from "react-router-dom";
+import TermsConditions from "./TermsConditions";
 // import { Container } from "react-bootstrap";
 
 export default function Signup() {
   const [validated, setValidated] = useState(false);
+  const [readAgreements, setReadAgreements] = useState(false);
   const [signupObj, setSignupObj] = useState({
     username: "",
     _password_hash: "",
@@ -273,10 +276,22 @@ export default function Signup() {
           <div className="d-flex align-items-center justify-content-center">
             <Form.Check
               required
-              label="Agree to terms and conditions"
+              // label="Agree to terms and conditions"
               feedback="You must agree before submitting."
               feedbackType="invalid"
+              checked={readAgreements}
+              onChange={(e) => setReadAgreements(!readAgreements)}
             />
+            <TermsConditions setReadAgreements={setReadAgreements} />
+            {/* <Form.Label
+              className="m-2 text-primary text-underline cursor-pointer"
+              onClick={(e) => console.log("clickin")}
+              htmlFor="custom-switch"
+            >
+              <a href="#" className="link-unstyled">
+                Agree to terms and conditions
+              </a>
+            </Form.Label> */}
           </div>
         </Form.Group>
 

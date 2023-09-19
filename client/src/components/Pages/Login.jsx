@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import useUserStore from "../../hooks/useStore";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
@@ -10,6 +10,7 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { updateUser, user } = useUserStore();
+  const [error, setError] = useState(""); // Step 1: State for error message
 
   const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ export default function Login() {
       username,
       password,
     };
+    setError(""); // Reset error message before making the request
     console.log(userObj);
     fetch("/api/login", {
       method: "POST",
@@ -41,6 +43,7 @@ export default function Login() {
         navigate("/userinfo");
       })
       .catch((error) => {
+        setError("Try again, stupid idiot"); // Step 2: Set error message
         console.log("error", error.message);
       });
   };
@@ -55,10 +58,17 @@ export default function Login() {
           transform: "translate(-50%, -50%)",
           border: "5px, black",
         }}
+        className="mt-5"
       >
         <Row className="justify-content-center mt-5">
           <Col lg={6}>
             <Form className="border p-4" onSubmit={(e) => handleLogin(e)}>
+              {error && (
+                <Alert className="mt-5" variant="danger">
+                  {error}
+                </Alert>
+              )}{" "}
+              {/* Step 4: Display error message */}
               <Form.Group className="mb-3" controlId="formBasicUsername">
                 <Form.Label>Username</Form.Label>
                 <Form.Control
@@ -68,7 +78,6 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </Form.Group>
-
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control
@@ -78,11 +87,9 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </Form.Group>
-
               <Button variant="dark" type="submit" className="m-1 rounded-0">
                 Login
               </Button>
-
               <Link
                 style={{ marginLeft: "5px" }}
                 className="btn btn-secondary rounded-0"

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
@@ -21,8 +21,19 @@ function DeletePairingModal({ displayMonth }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(),
-    });
+    })
+      .then(() => {
+        // Refresh the page after successful deletion
+        location.reload();
+      })
+      .catch((error) => {
+        console.error("Error deleting pairing:", error);
+      });
+    handleClose();
   }
+  useEffect(() => {
+    console.log("refreshing, isnt it? ");
+  }, [displayMonth]);
 
   return (
     <>
