@@ -28,6 +28,7 @@ export default function Logout() {
       .then((data) => {
         console.log(data);
         deleteUser();
+        localStorage.clear();
         navigate("/login");
       })
       .catch((error) => {

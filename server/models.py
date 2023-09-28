@@ -95,6 +95,8 @@ class Year(db.Model, SerializerMixin):
     year_duty_hours = db.Column(db.Float)
     year_reserve_no_fly_hours = db.Column(db.Float)
     year_reserve_no_fly_pay = db.Column(db.Float)
+
+    # year_guarantee_credited = db.Column(db.Float)
 # =================RELATIONSHIPS=======================================
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
     users_field = relationship('User', back_populates='years_field')
@@ -115,6 +117,7 @@ class Month(db.Model, SerializerMixin):
     #===============Reserve Stuff 
     month_guarantee_hours = db.Column(db.Float)
     month_guarantee_hours_worked_rated = db.Column(db.Float)
+    # month_guarantee_credited = db.Column(db.Float)
 
     #================TOTALS===================
     #=============TAFB
@@ -188,6 +191,7 @@ class Pairing(db.Model, SerializerMixin):
     reserve_block = db.Column(db.Boolean)
     pairing_guarantee_hours = db.Column(db.Float)
     pairing_guarantee_hours_worked_rated = db.Column(db.Float)
+    # pairing_guarantee_credited = db.Column(db.Float)
 
     #=============TAFB
     tafb_total = db.Column(db.Float)

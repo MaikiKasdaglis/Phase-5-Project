@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import useUserStore from "../../hooks/useStore";
 
-function PairingAddModal({ displayMonth, onPostSuccess }) {
+function PairingAddModal({ displayMonth, onPostSuccess, forceReset }) {
+  const { user } = useUserStore();
   //============MODAL SHIT=====================
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -76,6 +78,10 @@ function PairingAddModal({ displayMonth, onPostSuccess }) {
         console.log(`this is the reponse from new pairing post`, data);
         // window.location.reload();
         // onPostSuccess();
+        // fetch(`/api/users/${user.id}`);
+
+        forceReset("pairingAddModal");
+        location.reload();
       })
       .catch((error) => {
         console.log("error", error.message);

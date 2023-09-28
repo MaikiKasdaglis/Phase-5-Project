@@ -4,6 +4,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import useUserStore from "../../hooks/useStore";
+import Breadcrumbs from "../Pages/BreadCrumbs/Breadcrumbs";
 
 export default function RootLayout() {
   const { user } = useUserStore();
@@ -27,7 +28,7 @@ export default function RootLayout() {
             className="m-3 mt-0 mb-0"
           /> */}
 
-          {/* <Navbar.Brand href="#home">FA Pay Tracker</Navbar.Brand> */}
+          <Navbar.Brand href="#home">SWA Pay Tracker</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
@@ -77,6 +78,7 @@ export default function RootLayout() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      {/* <Breadcrumbs /> */}
       <main>
         <Outlet />
       </main>

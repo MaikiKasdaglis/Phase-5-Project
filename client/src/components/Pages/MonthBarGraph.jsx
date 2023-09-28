@@ -1,12 +1,25 @@
 /* eslint-disable react/prop-types */
+import { useState } from "react";
 import { Bar } from "react-chartjs-2";
 // import { useEffect } from "react";
 
 // eslint-disable-next-line no-unused-vars
-export default function MonthBarGraph({ betterMonth, refresh }) {
+export default function MonthBarGraph({
+  betterMonth,
+  refresh,
+  betterMonthState,
+}) {
+  const [betterPairingsState, setBetterPairingsState] = useState(
+    betterMonthState.pairings_field
+  );
+  // console.log("betterMonthState", betterMonthState);
+  // console.log("betterMonth", betterMonth);
+
   const betterPairings = betterMonth.pairings_field;
-  const labelsArray = betterPairings.map((pairing) => pairing.pairing_name);
-  const payArray = betterPairings.map((pairing) => pairing.pairing_total_pay);
+  // console.log("betterPairings", betterPairings);
+  // console.log("betterPairingsState", betterPairingsState);
+  const labelsArray = betterPairings?.map((pairing) => pairing.pairing_name);
+  const payArray = betterPairings?.map((pairing) => pairing.pairing_total_pay);
   const data = {
     labels: labelsArray,
     datasets: [

@@ -6,7 +6,7 @@ import DayAdder from "./DayAdder";
 import TafbForm from "./TafbForm";
 export default function PairingDashboard() {
   const location = useLocation();
-  console.log(location, "this is location");
+  // console.log(location, "this is location");
   const passPairing = location.state.passPairing;
 
   console.log("Received pairing object:", passPairing.pairing);

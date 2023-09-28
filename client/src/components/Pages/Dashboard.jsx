@@ -41,72 +41,87 @@ export default function Dashboard() {
   const [selectedMonthId, setSelectedMonthId] = useState(null);
   // console.log(monthId);
 
-  //=====================================testing some state that changes with delete pairing i can use as useEffect dependancy. it didn't work
-  // const [force, setForce] = useState(false);
-  // console.log("force from ogstate", force);
+  //=====================================testing some state that changes with delete pairing i can use as useEffect dependancy. SPOILER: it didn't work
+  const [force, setForce] = useState(false);
+  function forceReset(test) {
+    setForce(!force);
+  }
 
-  //====localStorage Setter Getter
-  useEffect(() => {
-    try {
-      //===================DISPLAY YEAR
-      const yearText = window?.localStorage.getItem("MY_Display_Year");
-      if (yearText) {
-        const parsedYear = JSON.parse(yearText);
-        setDisplayYear(parsedYear);
-      } else {
-        setDisplayYear(null);
-      }
+  //=================================================testing fetching state for graphs
+  const [betterMonthState, setBetterMonthState] = useState({});
 
-      //===================USERS MONTHS
-      const monthButtons = window?.localStorage.getItem("MY_MONTH_BUTTONS");
-      if (monthButtons) {
-        const parsedMonths = JSON.parse(monthButtons);
-        setUsersMonths(parsedMonths);
-      } else {
-        setUsersMonths([]);
-      }
+  //==========================================================LOCAL STORAGE GETTER
+  // useEffect(() => {
+  //   try {
+  //     //===================USERS YEAR
+  //     const userYears = window?.localStorage.getItem("USER_YEARS");
+  //     if (userYears) {
+  //       const parsedUserYears = JSON.parse(userYears);
+  //       setDisplayYear(parsedUserYears);
+  //     } else {
+  //       setDisplayYear(null);
+  //     }
+  //     //===================DISPLAY YEAR
+  //     const yearText = window?.localStorage.getItem("MY_Display_Year");
+  //     if (yearText) {
+  //       const parsedYear = JSON.parse(yearText);
+  //       setDisplayYear(parsedYear);
+  //     } else {
+  //       setDisplayYear(null);
+  //     }
 
-      //===================MONTH ID (DUMB)
-      const idForMonth = window?.localStorage.getItem("MY_MONTH_ID");
-      if (idForMonth) {
-        const parsedMonthId = JSON.parse(idForMonth);
-        setMonthId(parsedMonthId);
-      } else {
-        setMonthId(null);
-      }
+  //     //===================USERS MONTHS
+  //     const monthButtons = window?.localStorage.getItem("MY_MONTH_BUTTONS");
+  //     if (monthButtons) {
+  //       const parsedMonths = JSON.parse(monthButtons);
+  //       setUsersMonths(parsedMonths);
+  //     } else {
+  //       setUsersMonths([]);
+  //     }
 
-      //===================SELECTED MONTH ID (REDUNDANT, BUT IT AIN'T BROKE)
-      const idForSelectedMonth = window?.localStorage.getItem(
-        "MY_SELECTED_MONTH_ID"
-      );
-      if (idForSelectedMonth) {
-        const parsedSelectedMonthId = JSON.parse(idForSelectedMonth);
-        setSelectedMonthId(parsedSelectedMonthId);
-      } else {
-        setSelectedMonthId(null);
-      }
-    } catch (error) {
-      console.error("Error handling localStorage data:", error);
-      // Handle the error as needed
-    }
-  }, []);
-  //====localStorage Setter usersMonths
-  useEffect(() => {
-    //===================DISPLAY YEAR
-    window.localStorage.setItem("MY_Display_Year", JSON.stringify(displayYear));
-    //===================USERS MONTHS
-    window.localStorage.setItem(
-      "MY_MONTH_BUTTONS",
-      JSON.stringify(usersMonths)
-    );
-    //===================MONTH ID (DUMB)
-    window.localStorage.setItem("MY_MONTH_ID", JSON.stringify(monthId));
-    //===================SELECTED MONTH ID (REDUNDAT, BUT IT AIN'T BROKE)
-    window.localStorage.setItem(
-      "MY_SELECTED_MONTH_ID",
-      JSON.stringify(selectedMonthId)
-    );
-  }, [displayYear, usersMonths, monthId, selectedMonthId]);
+  //     //===================MONTH ID (DUMB)
+  //     const idForMonth = window?.localStorage.getItem("MY_MONTH_ID");
+  //     if (idForMonth) {
+  //       const parsedMonthId = JSON.parse(idForMonth);
+  //       setMonthId(parsedMonthId);
+  //     } else {
+  //       setMonthId(null);
+  //     }
+
+  //     //===================SELECTED MONTH ID (REDUNDANT, BUT IT AIN'T BROKE)
+  //     const idForSelectedMonth = window?.localStorage.getItem(
+  //       "MY_SELECTED_MONTH_ID"
+  //     );
+  //     if (idForSelectedMonth) {
+  //       const parsedSelectedMonthId = JSON.parse(idForSelectedMonth);
+  //       setSelectedMonthId(parsedSelectedMonthId);
+  //     } else {
+  //       setSelectedMonthId(null);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error handling localStorage data:", error);
+  //     // Handle the error as needed
+  //   }
+  // }, []);
+  // //==========================================================LOCAL STORAGE SETTER
+  // useEffect(() => {
+  //   //===================USER YEAR
+  //   window.localStorage.setItem("USER_YEARS", JSON.stringify(usersYears));
+  //   //===================DISPLAY YEAR
+  //   window.localStorage.setItem("MY_Display_Year", JSON.stringify(displayYear));
+  //   //===================USERS MONTHS
+  //   window.localStorage.setItem(
+  //     "MY_MONTH_BUTTONS",
+  //     JSON.stringify(usersMonths)
+  //   );
+  //   //===================MONTH ID (DUMB)
+  //   window.localStorage.setItem("MY_MONTH_ID", JSON.stringify(monthId));
+  //   //===================SELECTED MONTH ID (REDUNDAT, BUT IT AIN'T BROKE)
+  //   window.localStorage.setItem(
+  //     "MY_SELECTED_MONTH_ID",
+  //     JSON.stringify(selectedMonthId)
+  //   );
+  // }, [usersYears, displayYear, usersMonths, monthId, selectedMonthId]);
 
   //=============MODAL STUFF======================
   const [show, setShow] = useState(false);
@@ -216,6 +231,7 @@ export default function Dashboard() {
       });
   };
   //============= END MODAL STUFF======================
+
   //=============CAROUSEL STUFF======================
   const [index, setIndex] = useState(0);
   const handleSelect = (selectedIndex) => {
@@ -229,7 +245,7 @@ export default function Dashboard() {
       .then((data) => {
         setUsersYears(data.years_field);
       });
-  }, []);
+  }, [force, user.id]);
 
   //=============================MOSTLY USED IN GRAPHS/MODALS. SEEMS TO FIX SOME ASYNC ISSSUES
   // ============monthId is set when user clicks on month button mapped from USERSMONTHS
@@ -237,7 +253,7 @@ export default function Dashboard() {
   let displayMonth = usersMonths?.filter((month) => month.id === monthId);
   //==========betterMonth is same as displayMonth, just popped outta the array
   const betterMonth = displayMonth[0];
-  console.log("this is better month", betterMonth);
+  // console.log("this is better month", betterMonth);
   //============tried doing betterPairings instead of passing betterMonth or displayMonth[0] but ran into async issues. so its unused.
   const betterPairings = betterMonth?.pairings_field;
   //========================================USED FOR PRGRESS BARS
@@ -251,8 +267,12 @@ export default function Dashboard() {
       .then((response) => response.json())
       .then((data) => {
         setTestMonth(data);
-        console.log("this is data we just fetched", data);
-        console.log('this is "betterMonth for graph"', betterMonth);
+        setBetterMonthState(data);
+        // console.log(
+        //   "this is betterMonthState we just fetched",
+        //   betterMonthState
+        // );
+        // console.log('this is "betterMonth for graph"', betterMonth);
       });
   }, [monthId]);
 
@@ -401,19 +421,23 @@ export default function Dashboard() {
                   {betterMonth ? (
                     <MonthBarGraph
                       betterMonth={betterMonth}
+                      betterMonthState={betterMonthState}
                       // refresh={refreshOtherComponent}
                     />
                   ) : null}
                   {betterMonth ? (
                     <PairingAddModal
                       displayMonth={displayMonth}
+                      forceReset={forceReset}
+                      // setForce={setForce}
+                      // force={force}
                       // onPostSuccess={handlePostSuccess}
                     />
                   ) : null}
                   {betterMonth ? (
                     <DeletePairingModal
                       displayMonth={displayMonth}
-
+                      forceReset={forceReset}
                       // setForce={setForce}
                       // force={force}
                       // onPostSuccess={handlePostSuccess}

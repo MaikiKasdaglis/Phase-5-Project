@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 // eslint-disable-next-line no-unused-vars
-function DeletePairingModal({ displayMonth, setForce, force }) {
+function DeletePairingModal({ displayMonth, forceReset }) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -26,6 +26,8 @@ function DeletePairingModal({ displayMonth, setForce, force }) {
     })
       .then(() => {
         // Refresh the page after successful deletion
+        // setForce(!force);
+        forceReset("deletePairingModal");
         location.reload();
       })
       .catch((error) => {

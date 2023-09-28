@@ -65,7 +65,7 @@ function MonthTotalAll({ betterMonth }) {
                 <Table striped bordered hover size="sm">
                   <thead>
                     <tr>
-                      <th colSpan={5}>ALL CREDITS TOTALS</th>
+                      <th colSpan={5}>ALL TOTALS</th>
                     </tr>
                     <tr>
                       <th>Credits</th>

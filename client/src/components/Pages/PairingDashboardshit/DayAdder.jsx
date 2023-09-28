@@ -9,7 +9,7 @@ export default function DayAdder({ passPairing }) {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  console.log("FROM ADDER", passPairing.pairing.days_field.length + 1);
+  // console.log("FROM ADDER", passPairing.pairing.days_field.length + 1);
 
   const postObj = {
     a_hours: 0,
